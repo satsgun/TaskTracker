@@ -12,6 +12,7 @@ build/
 # Node / TypeScript
 node_modules/
 dist/
+coverage/
 
 # Database
 *.db
