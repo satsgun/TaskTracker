@@ -21,7 +21,12 @@ jobs:
         run: pip install -e ".[dev]"
 
       - name: Run tests
-        run: pytest --cov
+        run: pytest --cov --cov-report=xml --cov-report=term
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-xml
+          path: backend/coverage.xml
 
   frontend-tests:
     runs-on: ubuntu-latest
@@ -42,6 +47,53 @@ jobs:
 
       - name: Run tests
         run: npm run coverage
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: frontend-coverage-summary
+          path: frontend/coverage/coverage-summary.json
+
+  update-badges:
+    needs: [backend-tests, frontend-tests]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v6
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: backend-coverage-xml
+          path: backend
+
+      - uses: actions/download-artifact@v4
+        with:
+          name: frontend-coverage-summary
+          path: frontend/coverage
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Generate coverage badges
+        run: |
+          mkdir -p badges
+          pip install "genbadge[coverage]"
+          genbadge coverage -i backend/coverage.xml -o badges/backend-coverage.svg
+          npx --yes make-coverage-badge --report-path frontend/coverage/coverage-summary.json --output-path badges/frontend-coverage.svg
+
+      - name: Commit updated badges
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add badges/
+          git diff --cached --quiet || git commit -m "chore: update coverage badges [skip ci]"
+          git push
 
   deploy:
     needs: [backend-tests, frontend-tests]

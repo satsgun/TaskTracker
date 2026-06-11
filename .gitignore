@@ -4,6 +4,7 @@ __pycache__/
 .venv/
 .pytest_cache/
 .coverage
+coverage.xml
 htmlcov/
 *.egg-info/
 dist/
@@ -22,3 +23,6 @@ coverage/
 .DS_Store
 .vscode/
 .idea/
+
+# Claude Code
+.claude/
