@@ -1,4 +1,3 @@
-import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
@@ -43,9 +42,6 @@ class TestListTasks:
         assert incomplete["id"] in ids
         assert complete["id"] in ids
 
-    @pytest.mark.xfail(
-        strict=True, reason="requires PATCH /tasks/<id>/ to mark a task complete (see Task 33)"
-    )
     def test_status_pending_excludes_complete_tasks(self):
         incomplete = _create_task(description="Water plants")
         complete = _create_task(description="Renew passport")
@@ -87,9 +83,6 @@ class TestListTasks:
 
         assert response.json() == []
 
-    @pytest.mark.xfail(
-        strict=True, reason="requires PATCH /tasks/<id>/ to mark a task complete (see Task 33)"
-    )
     def test_combined_status_and_search(self):
         incomplete_match = _create_task(description="Buy stamps")
         complete_match = _create_task(description="Buy a gift")
