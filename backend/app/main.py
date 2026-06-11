@@ -45,6 +45,12 @@ def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)) -
             raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
 
 
+@app.delete("/tasks/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)
+def delete_task(task_id: int, db: Session = Depends(get_db)) -> None:
+    if not crud.delete_task(db, task_id):
+        raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+
+
 _DEFAULT_FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
 _frontend_dist = Path(os.environ.get("FRONTEND_DIST", _DEFAULT_FRONTEND_DIST))
 
