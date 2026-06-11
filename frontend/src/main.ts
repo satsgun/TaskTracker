@@ -93,8 +93,13 @@ function init(): void {
   function render(): void {
     if (tasks.length === 0) {
       renderEmptyState();
+      if (searchQuery === "" && statusFilter === "all") {
+        renderCounter(counter as HTMLElement, tasks);
+      }
       return;
     }
+
+    renderCounter(counter as HTMLElement, tasks);
 
     errorStateEl!.hidden = true;
     emptyStateEl!.hidden = true;
@@ -103,7 +108,6 @@ function init(): void {
     legendEl!.hidden = false;
     addTaskEl!.hidden = false;
 
-    renderCounter(counter as HTMLElement, tasks);
     renderTaskList(taskListEl as HTMLElement, tasks, new Date(), editingId);
   }
 
