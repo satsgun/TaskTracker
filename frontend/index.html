@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Task Tracker</title>
+    <link rel="stylesheet" href="/src/style.css" />
+  </head>
+  <body>
+    <div id="app">
+      <header class="app-header">
+        <h1>Task Tracker</h1>
+        <p class="task-counter" id="task-counter">6 tasks · 4 pending</p>
+      </header>
+
+      <section class="add-task" aria-label="Add task">
+        <form id="add-task-form" class="add-task-form" novalidate>
+          <div class="form-field form-field--description">
+            <label for="description">Description</label>
+            <input type="text" id="description" name="description" placeholder="What needs doing?" required />
+            <p class="field-error" id="description-error" hidden></p>
+          </div>
+          <div class="form-field">
+            <label for="priority">Priority</label>
+            <select id="priority" name="priority">
+              <option value="High">High</option>
+              <option value="Medium" selected>Medium</option>
+              <option value="Low">Low</option>
+            </select>
+          </div>
+          <div class="form-field">
+            <label for="due_date">Due date</label>
+            <input type="date" id="due_date" name="due_date" />
+          </div>
+          <button type="submit" class="btn btn-primary">Add task</button>
+        </form>
+      </section>
+
+      <section class="filter-bar" aria-label="Filters">
+        <div class="status-toggle" role="group" aria-label="Status filter">
+          <button type="button" class="toggle-btn" data-status="pending">Pending</button>
+          <button type="button" class="toggle-btn is-active" data-status="all">All</button>
+        </div>
+        <div class="search-field">
+          <label for="search" class="visually-hidden">Search tasks</label>
+          <input type="search" id="search" name="q" placeholder="Search tasks…" />
+        </div>
+      </section>
+
+      <ul class="legend">
+        <li class="legend-item legend-item--overdue">Overdue</li>
+        <li class="legend-item legend-item--complete">Complete</li>
+        <li class="legend-item legend-item--incomplete">Incomplete, not overdue</li>
+      </ul>
+
+      <ul class="task-list" id="task-list">
+        <li class="task task--overdue" data-status="incomplete" data-priority="high">
+          <span class="task-accent"></span>
+          <div class="task-main">
+            <span class="priority-badge priority-badge--high">High</span>
+            <p class="task-description">Pay electricity bill</p>
+            <p class="task-due">Overdue · Jun 1</p>
+          </div>
+          <div class="task-actions">
+            <button class="icon-btn icon-btn--complete" aria-label="Mark complete">○</button>
+            <button class="icon-btn icon-btn--edit" aria-label="Edit task">✎</button>
+            <button class="icon-btn icon-btn--delete" aria-label="Delete task">🗑</button>
+          </div>
+        </li>
+
+        <li class="task task--incomplete" data-status="incomplete" data-priority="high">
+          <span class="task-accent"></span>
+          <div class="task-main">
+            <span class="priority-badge priority-badge--high">High</span>
+            <p class="task-description">Write quarterly report</p>
+            <p class="task-due">No due date</p>
+          </div>
+          <div class="task-actions">
+            <button class="icon-btn icon-btn--complete" aria-label="Mark complete">○</button>
+            <button class="icon-btn icon-btn--edit" aria-label="Edit task">✎</button>
+            <button class="icon-btn icon-btn--delete" aria-label="Delete task">🗑</button>
+          </div>
+        </li>
+
+        <li class="task task--complete" data-status="complete" data-priority="medium">
+          <span class="task-accent"></span>
+          <div class="task-main">
+            <span class="priority-badge priority-badge--medium">Medium</span>
+            <p class="task-description">Send invoice</p>
+            <p class="task-due">Due Jun 5</p>
+          </div>
+          <div class="task-actions">
+            <button class="icon-btn icon-btn--complete" aria-label="Mark incomplete">●</button>
+            <button class="icon-btn icon-btn--edit" aria-label="Edit task">✎</button>
+            <button class="icon-btn icon-btn--delete" aria-label="Delete task">🗑</button>
+          </div>
+        </li>
+
+        <li class="task task--complete" data-status="complete" data-priority="medium">
+          <span class="task-accent"></span>
+          <div class="task-main">
+            <span class="priority-badge priority-badge--medium">Medium</span>
+            <p class="task-description">Clean garage</p>
+            <p class="task-due">Due Jun 8</p>
+          </div>
+          <div class="task-actions">
+            <button class="icon-btn icon-btn--complete" aria-label="Mark incomplete">●</button>
+            <button class="icon-btn icon-btn--edit" aria-label="Edit task">✎</button>
+            <button class="icon-btn icon-btn--delete" aria-label="Delete task">🗑</button>
+          </div>
+        </li>
+
+        <li class="task task--incomplete" data-status="incomplete" data-priority="low">
+          <span class="task-accent"></span>
+          <div class="task-main">
+            <span class="priority-badge priority-badge--low">Low</span>
+            <p class="task-description">Buy groceries</p>
+            <p class="task-due">Due Jun 20</p>
+          </div>
+          <div class="task-actions">
+            <button class="icon-btn icon-btn--complete" aria-label="Mark complete">○</button>
+            <button class="icon-btn icon-btn--edit" aria-label="Edit task">✎</button>
+            <button class="icon-btn icon-btn--delete" aria-label="Delete task">🗑</button>
+          </div>
+        </li>
+
+        <li class="task task--overdue" data-status="incomplete" data-priority="low">
+          <span class="task-accent"></span>
+          <div class="task-main">
+            <span class="priority-badge priority-badge--low">Low</span>
+            <p class="task-description">Schedule dentist appointment</p>
+            <p class="task-due">Overdue · Jun 3</p>
+          </div>
+          <div class="task-actions">
+            <button class="icon-btn icon-btn--complete" aria-label="Mark complete">○</button>
+            <button class="icon-btn icon-btn--edit" aria-label="Edit task">✎</button>
+            <button class="icon-btn icon-btn--delete" aria-label="Delete task">🗑</button>
+          </div>
+        </li>
+      </ul>
+    </div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>
