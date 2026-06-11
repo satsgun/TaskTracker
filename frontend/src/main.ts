@@ -17,6 +17,9 @@ function init(): void {
   const errorStateEl = document.querySelector<HTMLElement>("#error-state");
   const retryBtn = document.querySelector<HTMLButtonElement>("#retry-btn");
   const emptyStateEl = document.querySelector<HTMLElement>("#empty-state");
+  const actionBannerEl = document.querySelector<HTMLElement>("#action-banner");
+  const bannerMessageEl = document.querySelector<HTMLElement>("#action-banner .banner-message");
+  const bannerDismissBtn = document.querySelector<HTMLButtonElement>("#action-banner .banner-dismiss");
 
   if (
     !form ||
@@ -32,7 +35,10 @@ function init(): void {
     !legendEl ||
     !errorStateEl ||
     !retryBtn ||
-    !emptyStateEl
+    !emptyStateEl ||
+    !actionBannerEl ||
+    !bannerMessageEl ||
+    !bannerDismissBtn
   ) {
     return;
   }
@@ -140,6 +146,15 @@ function init(): void {
     errorEl!.hidden = true;
   }
 
+  function showBanner(message: string): void {
+    bannerMessageEl!.textContent = message;
+    actionBannerEl!.hidden = false;
+  }
+
+  bannerDismissBtn.addEventListener("click", () => {
+    actionBannerEl!.hidden = true;
+  });
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
@@ -213,8 +228,26 @@ function init(): void {
     }
 
     if (target.closest(".icon-btn--complete")) {
-      task.status = task.status === "Complete" ? "Incomplete" : "Complete";
-      render();
+      const newStatus = task.status === "Complete" ? "Incomplete" : "Complete";
+      void (async () => {
+        try {
+          const response = await fetch(`/tasks/${id}/`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: newStatus }),
+          });
+
+          if (!response.ok) {
+            showBanner(`Couldn't update "${task.description}". Please try again.`);
+            return;
+          }
+
+          task.status = newStatus;
+          render();
+        } catch {
+          showBanner(`Couldn't update "${task.description}". Please try again.`);
+        }
+      })();
     } else if (target.closest(".icon-btn--delete")) {
       tasks = tasks.filter((t) => t.id !== id);
       render();
