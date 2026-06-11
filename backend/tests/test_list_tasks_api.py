@@ -6,7 +6,7 @@ from app.main import app
 client = TestClient(app)
 
 pytestmark = pytest.mark.xfail(
-    strict=True, reason="GET /tasks/ not yet implemented (see Task 25+)"
+    strict=True, reason="GET /tasks/list not yet implemented (see Task 25+)"
 )
 
 
@@ -17,9 +17,13 @@ def _create_task(**overrides):
     return response.json()
 
 
+def _mark_complete(task_id):
+    client.patch(f"/tasks/{task_id}/", json={"status": "Complete"})
+
+
 class TestListTasks:
     def test_list_tasks_returns_200_and_a_list(self):
-        response = client.get("/tasks/")
+        response = client.get("/tasks/list")
 
         assert response.status_code == 200
         assert isinstance(response.json(), list)
@@ -27,7 +31,7 @@ class TestListTasks:
     def test_list_tasks_includes_created_tasks(self):
         created = _create_task(description="Buy milk")
 
-        response = client.get("/tasks/")
+        response = client.get("/tasks/list")
 
         ids = [task["id"] for task in response.json()]
         assert created["id"] in ids
@@ -35,9 +39,9 @@ class TestListTasks:
     def test_default_status_is_all_includes_complete_and_incomplete(self):
         incomplete = _create_task(description="Write report")
         complete = _create_task(description="Pay bills")
-        client.patch(f"/tasks/{complete['id']}/complete")
+        _mark_complete(complete["id"])
 
-        response = client.get("/tasks/")
+        response = client.get("/tasks/list")
 
         ids = [task["id"] for task in response.json()]
         assert incomplete["id"] in ids
@@ -46,9 +50,9 @@ class TestListTasks:
     def test_status_pending_excludes_complete_tasks(self):
         incomplete = _create_task(description="Water plants")
         complete = _create_task(description="Renew passport")
-        client.patch(f"/tasks/{complete['id']}/complete")
+        _mark_complete(complete["id"])
 
-        response = client.get("/tasks/", params={"status": "pending"})
+        response = client.get("/tasks/list", params={"status": "pending"})
 
         ids = [task["id"] for task in response.json()]
         assert incomplete["id"] in ids
@@ -56,15 +60,15 @@ class TestListTasks:
 
     def test_status_all_includes_complete_tasks(self):
         complete = _create_task(description="File taxes")
-        client.patch(f"/tasks/{complete['id']}/complete")
+        _mark_complete(complete["id"])
 
-        response = client.get("/tasks/", params={"status": "all"})
+        response = client.get("/tasks/list", params={"status": "all"})
 
         ids = [task["id"] for task in response.json()]
         assert complete["id"] in ids
 
     def test_invalid_status_returns_422(self):
-        response = client.get("/tasks/", params={"status": "bogus"})
+        response = client.get("/tasks/list", params={"status": "bogus"})
 
         assert response.status_code == 422
         assert "detail" in response.json()
@@ -73,24 +77,34 @@ class TestListTasks:
         match = _create_task(description="Buy groceries")
         other = _create_task(description="Schedule dentist")
 
-        response = client.get("/tasks/", params={"q": "GROCER"})
+        response = client.get("/tasks/list", params={"q": "GROCER"})
 
         ids = [task["id"] for task in response.json()]
         assert match["id"] in ids
         assert other["id"] not in ids
 
     def test_search_with_no_matches_returns_empty_list(self):
-        response = client.get("/tasks/", params={"q": "no-such-task-zzz"})
+        response = client.get("/tasks/list", params={"q": "no-such-task-zzz"})
 
         assert response.json() == []
 
     def test_combined_status_and_search(self):
         incomplete_match = _create_task(description="Buy stamps")
         complete_match = _create_task(description="Buy a gift")
-        client.patch(f"/tasks/{complete_match['id']}/complete")
+        _mark_complete(complete_match["id"])
 
-        response = client.get("/tasks/", params={"status": "pending", "q": "buy"})
+        response = client.get("/tasks/list", params={"status": "pending", "q": "buy"})
 
         ids = [task["id"] for task in response.json()]
         assert incomplete_match["id"] in ids
         assert complete_match["id"] not in ids
+
+    def test_results_are_sorted_by_priority(self):
+        low = _create_task(description="Low priority sort marker", priority="Low")
+        high = _create_task(description="High priority sort marker", priority="High")
+        medium = _create_task(description="Medium priority sort marker", priority="Medium")
+
+        response = client.get("/tasks/list", params={"q": "sort marker"})
+
+        ids = [task["id"] for task in response.json()]
+        assert ids.index(high["id"]) < ids.index(medium["id"]) < ids.index(low["id"])
