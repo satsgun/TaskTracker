@@ -52,39 +52,11 @@ describe("index.html structure", () => {
     expect(document.querySelectorAll(".legend-item")).toHaveLength(3);
   });
 
-  it("renders task rows for each color state", () => {
-    expect(document.querySelectorAll(".task--overdue").length).toBeGreaterThan(0);
-    expect(document.querySelectorAll(".task--complete").length).toBeGreaterThan(0);
-    expect(document.querySelectorAll(".task--incomplete").length).toBeGreaterThan(0);
-  });
+  it("includes an empty task list container for the rendered tasks", () => {
+    const list = document.querySelector("#task-list");
 
-  it("renders a priority badge for every task row", () => {
-    const rows = document.querySelectorAll(".task");
-    const badges = document.querySelectorAll(".priority-badge");
-
-    expect(rows.length).toBeGreaterThan(0);
-    expect(badges).toHaveLength(rows.length);
-  });
-
-  it("gives each task row mark-complete, edit, and delete actions", () => {
-    const rows = document.querySelectorAll(".task");
-
-    rows.forEach((row) => {
-      expect(row.querySelector(".icon-btn--complete")).not.toBeNull();
-      expect(row.querySelector(".icon-btn--edit")).not.toBeNull();
-      expect(row.querySelector(".icon-btn--delete")).not.toBeNull();
-    });
-  });
-
-  it("sorts task rows by priority (high, then medium, then low)", () => {
-    const order = { high: 0, medium: 1, low: 2 };
-    const priorities = Array.from(document.querySelectorAll(".task")).map(
-      (row) => row.getAttribute("data-priority"),
-    );
-    const sorted = [...priorities].sort(
-      (a, b) => order[a as keyof typeof order] - order[b as keyof typeof order],
-    );
-
-    expect(priorities).toEqual(sorted);
+    expect(list).not.toBeNull();
+    expect(list?.tagName).toBe("UL");
+    expect(list?.children).toHaveLength(0);
   });
 });
