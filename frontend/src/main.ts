@@ -270,11 +270,36 @@ function init(): void {
     } else if (target.closest(".btn-save")) {
       const input = row.querySelector<HTMLInputElement>(".task-edit-input");
       const newDescription = input?.value.trim();
-      if (newDescription) {
-        task.description = newDescription;
+      if (!newDescription) {
+        editingId = null;
+        render();
+        return;
       }
-      editingId = null;
-      render();
+
+      void (async () => {
+        try {
+          const response = await fetch(`/tasks/${id}/`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ description: newDescription }),
+          });
+
+          editingId = null;
+
+          if (!response.ok) {
+            showBanner(`Couldn't update "${task.description}". Please try again.`);
+            render();
+            return;
+          }
+
+          task.description = newDescription;
+          render();
+        } catch {
+          editingId = null;
+          showBanner(`Couldn't update "${task.description}". Please try again.`);
+          render();
+        }
+      })();
     } else if (target.closest(".btn-cancel")) {
       editingId = null;
       render();

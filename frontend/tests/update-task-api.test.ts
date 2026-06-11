@@ -15,7 +15,7 @@ function jsonResponse(status: number, body: unknown) {
   return {
     ok: status >= 200 && status < 300,
     status,
-    json: async () => body,
+    json: async () => JSON.parse(JSON.stringify(body)),
   };
 }
 
@@ -77,7 +77,7 @@ describe("Update task description (API-backed)", () => {
     vi.unstubAllGlobals();
   });
 
-  it.fails(
+  it(
     "saving an edit sends PATCH status and updates an overdue row, keeping it red",
     async () => {
       const fetchMock = setupFetch([OVERDUE_INCOMPLETE], () => jsonResponse(204, null));
@@ -101,7 +101,7 @@ describe("Update task description (API-backed)", () => {
     },
   );
 
-  it.fails(
+  it(
     "saving an edit on a complete-and-overdue row keeps it green (completion wins over overdue)",
     async () => {
       const fetchMock = setupFetch([OVERDUE_COMPLETE], () => jsonResponse(204, null));
@@ -125,7 +125,7 @@ describe("Update task description (API-backed)", () => {
     },
   );
 
-  it.fails(
+  it(
     "saving an edit on a not-yet-due incomplete row keeps it blue",
     async () => {
       const fetchMock = setupFetch([FUTURE_INCOMPLETE], () => jsonResponse(204, null));
@@ -149,7 +149,7 @@ describe("Update task description (API-backed)", () => {
     },
   );
 
-  it.fails(
+  it(
     "shows a dismissible banner and keeps the original description when the update fails",
     async () => {
       const fetchMock = setupFetch([OVERDUE_INCOMPLETE], () => jsonResponse(500, { detail: "Internal Server Error" }));
