@@ -39,6 +39,17 @@ def delete_task(db: Session, task_id: int) -> bool:
     return True
 
 
+def update_task(db: Session, task_id: int, description: str) -> Task | None:
+    task = db.get(Task, task_id)
+    if task is None:
+        return None
+
+    task.description = description
+    db.commit()
+    db.refresh(task)
+    return task
+
+
 def list_tasks(db: Session, status: str = "all", q: str | None = None) -> list[Task]:
     stmt = select(Task)
 
