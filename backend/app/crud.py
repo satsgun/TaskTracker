@@ -18,6 +18,17 @@ def create_task(
     return task
 
 
+def set_status(db: Session, task_id: int, status: str) -> Task | None:
+    task = db.get(Task, task_id)
+    if task is None:
+        return None
+
+    task.status = status
+    db.commit()
+    db.refresh(task)
+    return task
+
+
 def list_tasks(db: Session, status: str = "all", q: str | None = None) -> list[Task]:
     stmt = select(Task)
 
