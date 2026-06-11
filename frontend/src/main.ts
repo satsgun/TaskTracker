@@ -249,8 +249,21 @@ function init(): void {
         }
       })();
     } else if (target.closest(".icon-btn--delete")) {
-      tasks = tasks.filter((t) => t.id !== id);
-      render();
+      void (async () => {
+        try {
+          const response = await fetch(`/tasks/${id}/`, { method: "DELETE" });
+
+          if (!response.ok) {
+            showBanner(`Couldn't delete "${task.description}". Please try again.`);
+            return;
+          }
+
+          tasks = tasks.filter((t) => t.id !== id);
+          render();
+        } catch {
+          showBanner(`Couldn't delete "${task.description}". Please try again.`);
+        }
+      })();
     } else if (target.closest(".icon-btn--edit")) {
       editingId = editingId === id ? null : id;
       render();

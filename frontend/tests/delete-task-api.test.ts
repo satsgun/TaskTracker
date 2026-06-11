@@ -63,7 +63,7 @@ describe("Delete task (API-backed)", () => {
     vi.unstubAllGlobals();
   });
 
-  it.fails("deleting a task sends DELETE /tasks/<id>/ and removes the row, updating the counter", async () => {
+  it("deleting a task sends DELETE /tasks/<id>/ and removes the row, updating the counter", async () => {
     const fetchMock = setupFetch([TASK_A, TASK_B], () => jsonResponse(204, null));
     vi.stubGlobal("fetch", fetchMock);
 
@@ -83,7 +83,7 @@ describe("Delete task (API-backed)", () => {
     expect(document.querySelector("#task-counter")?.textContent).toContain(`${before - 1} task`);
   });
 
-  it.fails("shows a dismissible banner and leaves the row when delete fails", async () => {
+  it("shows a dismissible banner and leaves the row when delete fails", async () => {
     const fetchMock = setupFetch([TASK_A, TASK_B], () => jsonResponse(500, { detail: "Internal Server Error" }));
     vi.stubGlobal("fetch", fetchMock);
 
