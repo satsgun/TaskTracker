@@ -132,6 +132,10 @@ describe("Mark as complete (API-backed)", () => {
       row.querySelector<HTMLButtonElement>(".icon-btn--complete")!.click();
       await flushAsync();
 
+      const patchCall = fetchMock.mock.calls.find(([, init]) => init?.method === "PATCH");
+      expect(patchCall?.[0]).toBe("/tasks/3/");
+      expect(JSON.parse((patchCall?.[1] as FetchInit).body ?? "{}")).toEqual({ status: "Incomplete" });
+
       const updatedRow = document.querySelector<HTMLElement>('.task[data-id="3"]')!;
       expect(updatedRow.classList.contains("task--incomplete")).toBe(true);
     },

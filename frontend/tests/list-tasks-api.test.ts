@@ -44,7 +44,7 @@ describe("List tasks (API-backed)", () => {
     vi.unstubAllGlobals();
   });
 
-  it.fails("fetches tasks from GET /tasks/list on load and renders them", async () => {
+  it("fetches tasks from GET /tasks/list on load and renders them", async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(200, SAMPLE_TASKS));
     vi.stubGlobal("fetch", fetchMock);
 
@@ -55,7 +55,7 @@ describe("List tasks (API-backed)", () => {
     expect(getRows().length).toBe(SAMPLE_TASKS.length);
   });
 
-  it.fails(
+  it(
     "applies output-formatting colors: overdue=red, complete wins over overdue=green, incomplete-not-overdue=blue",
     async () => {
       const fetchMock = vi.fn().mockResolvedValue(jsonResponse(200, SAMPLE_TASKS));
@@ -74,7 +74,7 @@ describe("List tasks (API-backed)", () => {
     },
   );
 
-  it.fails("shows a first-run empty state when GET /tasks/list returns no tasks", async () => {
+  it("shows a first-run empty state when GET /tasks/list returns no tasks", async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(200, []));
     vi.stubGlobal("fetch", fetchMock);
 
@@ -87,7 +87,7 @@ describe("List tasks (API-backed)", () => {
     expect(document.querySelector<HTMLElement>(".add-task")?.hidden).toBe(false);
   });
 
-  it.fails("shows a no-matches empty state when a search returns no results, keeping filters visible", async () => {
+  it("shows a no-matches empty state when a search returns no results, keeping filters visible", async () => {
     const fetchMock = vi
       .fn()
       .mockResolvedValueOnce(jsonResponse(200, SAMPLE_TASKS))
@@ -114,7 +114,7 @@ describe("List tasks (API-backed)", () => {
     expect(document.querySelector<HTMLButtonElement>("#clear-search-btn")).toBeTruthy();
   });
 
-  it.fails("shows a retry panel when the initial load fails with an HTTP error", async () => {
+  it("shows a retry panel when the initial load fails with an HTTP error", async () => {
     const fetchMock = vi.fn().mockResolvedValue(jsonResponse(500, { detail: "Internal Server Error" }));
     vi.stubGlobal("fetch", fetchMock);
 
@@ -128,7 +128,7 @@ describe("List tasks (API-backed)", () => {
     expect(document.querySelector<HTMLButtonElement>("#retry-btn")).toBeTruthy();
   });
 
-  it.fails("shows a retry panel on a network error and recovers when retry succeeds", async () => {
+  it("shows a retry panel on a network error and recovers when retry succeeds", async () => {
     const fetchMock = vi
       .fn()
       .mockRejectedValueOnce(new TypeError("Failed to fetch"))

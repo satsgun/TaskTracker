@@ -53,6 +53,13 @@
         <li class="legend-item legend-item--incomplete">Incomplete, not overdue</li>
       </ul>
 
+      <div id="error-state" class="state-panel" hidden>
+        <p>Something went wrong loading your tasks.</p>
+        <button type="button" id="retry-btn" class="btn btn-primary">Retry</button>
+      </div>
+
+      <div id="empty-state" class="state-panel" hidden></div>
+
       <ul class="task-list" id="task-list"></ul>
     </div>
     <script type="module" src="/src/main.ts"></script>

@@ -113,6 +113,12 @@ describe("Update task description (API-backed)", () => {
       editAndSave(2, "Send the invoice to client");
       await flushAsync();
 
+      const patchCall = fetchMock.mock.calls.find(([, init]) => init?.method === "PATCH");
+      expect(patchCall?.[0]).toBe("/tasks/2/");
+      expect(JSON.parse((patchCall?.[1] as FetchInit).body ?? "{}")).toEqual({
+        description: "Send the invoice to client",
+      });
+
       const updatedRow = document.querySelector<HTMLElement>('.task[data-id="2"]')!;
       expect(updatedRow.querySelector(".task-description")?.textContent).toBe("Send the invoice to client");
       expect(updatedRow.classList.contains("task--complete")).toBe(true);
@@ -130,6 +136,12 @@ describe("Update task description (API-backed)", () => {
 
       editAndSave(3, "Buy groceries for the week");
       await flushAsync();
+
+      const patchCall = fetchMock.mock.calls.find(([, init]) => init?.method === "PATCH");
+      expect(patchCall?.[0]).toBe("/tasks/3/");
+      expect(JSON.parse((patchCall?.[1] as FetchInit).body ?? "{}")).toEqual({
+        description: "Buy groceries for the week",
+      });
 
       const updatedRow = document.querySelector<HTMLElement>('.task[data-id="3"]')!;
       expect(updatedRow.querySelector(".task-description")?.textContent).toBe("Buy groceries for the week");
