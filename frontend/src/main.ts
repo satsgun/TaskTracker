@@ -27,7 +27,6 @@ function init(): void {
   }
 
   let tasks: Task[] = createMockTasks();
-  let nextId = tasks.length + 1;
   let statusFilter: StatusFilter = "all";
   let searchQuery = "";
   let editingId: number | null = null;
@@ -52,7 +51,7 @@ function init(): void {
     errorEl!.hidden = true;
   }
 
-  form.addEventListener("submit", (event) => {
+  form.addEventListener("submit", async (event) => {
     event.preventDefault();
 
     const description = descriptionInput.value.trim();
@@ -61,17 +60,31 @@ function init(): void {
       return;
     }
 
-    tasks.push({
-      id: nextId++,
-      description,
-      priority: (priorityInput.value as Priority) || "Medium",
-      due_date: dueInput.value || null,
-      status: "Incomplete",
-    });
+    try {
+      const response = await fetch("/tasks/", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          description,
+          priority: (priorityInput.value as Priority) || "Medium",
+          due_date: dueInput.value || null,
+        }),
+      });
 
-    form.reset();
-    clearError();
-    render();
+      const body = await response.json();
+
+      if (!response.ok) {
+        showError(body.detail ?? "Something went wrong. Please try again.");
+        return;
+      }
+
+      tasks.push(body as Task);
+      form.reset();
+      clearError();
+      render();
+    } catch {
+      showError("Network error. Please try again.");
+    }
   });
 
   descriptionInput.addEventListener("input", () => {

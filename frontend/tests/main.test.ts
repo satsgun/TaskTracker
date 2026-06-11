@@ -50,18 +50,6 @@ describe("Task Tracker UI interactions", () => {
     expect(document.querySelector<HTMLElement>("#description-error")?.hidden).toBe(true);
   });
 
-  it("adds a new task and updates the counter", () => {
-    const before = getRows().length;
-    const input = document.querySelector<HTMLInputElement>('input[name="description"]')!;
-    input.value = "New task";
-
-    document.querySelector<HTMLFormElement>("#add-task-form")!.requestSubmit();
-
-    expect(getRows().length).toBe(before + 1);
-    expect(document.querySelector("#task-counter")?.textContent).toContain(`${before + 1} task`);
-    expect(Array.from(getRows()).some((row) => row.textContent?.includes("New task"))).toBe(true);
-  });
-
   it("toggles a task's completion state and updates the pending count", () => {
     const counterBefore = document.querySelector("#task-counter")?.textContent;
     const row = getRows()[0];

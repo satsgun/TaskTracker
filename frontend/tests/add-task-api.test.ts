@@ -37,7 +37,7 @@ describe("Add task (API-backed)", () => {
     vi.unstubAllGlobals();
   });
 
-  it.fails("submits the new task to POST /tasks/", async () => {
+  it("submits the new task to POST /tasks/", async () => {
     const fetchMock = mockFetchResponse(201, {
       id: 101,
       description: "New task",
@@ -61,7 +61,7 @@ describe("Add task (API-backed)", () => {
     );
   });
 
-  it.fails("adds the task returned by the API to the list", async () => {
+  it("adds the task returned by the API to the list", async () => {
     const fetchMock = mockFetchResponse(201, {
       id: 101,
       description: "New task from API",
@@ -82,7 +82,7 @@ describe("Add task (API-backed)", () => {
     expect(newRow?.textContent).toContain("New task from API");
   });
 
-  it.fails("calls the API and resets the form after a successful add", async () => {
+  it("calls the API and resets the form after a successful add", async () => {
     const fetchMock = mockFetchResponse(201, {
       id: 102,
       description: "Another task",
@@ -102,7 +102,7 @@ describe("Add task (API-backed)", () => {
     expect(input.value).toBe("");
   });
 
-  it.fails("shows the API's error message and retains input on a 422 response", async () => {
+  it("shows the API's error message and retains input on a 422 response", async () => {
     const fetchMock = mockFetchResponse(422, { detail: "That description is already in use." });
     vi.stubGlobal("fetch", fetchMock);
     const before = getRows().length;
@@ -119,7 +119,7 @@ describe("Add task (API-backed)", () => {
     expect(getRows().length).toBe(before);
   });
 
-  it.fails("shows and then clears the API's error message on the next keystroke", async () => {
+  it("shows and then clears the API's error message on the next keystroke", async () => {
     const fetchMock = mockFetchResponse(422, { detail: "That description is already in use." });
     vi.stubGlobal("fetch", fetchMock);
     const input = document.querySelector<HTMLInputElement>('input[name="description"]')!;
