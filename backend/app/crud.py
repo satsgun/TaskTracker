@@ -29,6 +29,16 @@ def set_status(db: Session, task_id: int, status: str) -> Task | None:
     return task
 
 
+def delete_task(db: Session, task_id: int) -> bool:
+    task = db.get(Task, task_id)
+    if task is None:
+        return False
+
+    db.delete(task)
+    db.commit()
+    return True
+
+
 def list_tasks(db: Session, status: str = "all", q: str | None = None) -> list[Task]:
     stmt = select(Task)
 

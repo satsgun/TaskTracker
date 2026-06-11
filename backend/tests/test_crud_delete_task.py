@@ -1,10 +1,3 @@
-import pytest
-
-pytestmark = pytest.mark.xfail(
-    strict=True, reason="DB layer (app.database/app.models/app.crud) not yet implemented (see Task 25/26)"
-)
-
-
 def _make_session():
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
