@@ -39,7 +39,7 @@ class TestDeleteTask:
         response = client.delete("/tasks/999999/")
 
         assert response.status_code == 404
-        assert "detail" in response.json()
+        assert "999999" in response.json()["detail"]
 
     def test_delete_already_deleted_task_returns_404(self):
         task = _create_task(description="Pay bills")
@@ -48,7 +48,7 @@ class TestDeleteTask:
         response = client.delete(f"/tasks/{task['id']}/")
 
         assert response.status_code == 404
-        assert "detail" in response.json()
+        assert str(task["id"]) in response.json()["detail"]
 
     def test_deleting_one_task_does_not_affect_others(self):
         keep = _create_task(description="Renew passport")

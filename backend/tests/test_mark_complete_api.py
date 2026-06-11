@@ -59,7 +59,7 @@ class TestMarkAsComplete:
         response = client.patch("/tasks/999999/", json={"status": "Complete"})
 
         assert response.status_code == 404
-        assert "detail" in response.json()
+        assert "999999" in response.json()["detail"]
 
     def test_invalid_status_value_returns_422(self):
         task = _create_task(description="Schedule dentist")

@@ -67,7 +67,7 @@ class TestUpdateTask:
         response = client.patch("/tasks/999999/", json={"description": "Anything"})
 
         assert response.status_code == 404
-        assert "detail" in response.json()
+        assert "999999" in response.json()["detail"]
 
     def test_update_with_empty_description_returns_422(self):
         task = _create_task(description="Renew passport")
