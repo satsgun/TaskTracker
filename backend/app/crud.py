@@ -1,11 +1,11 @@
 from datetime import date
 
-from sqlalchemy import case, select
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.models import Task
 
-_PRIORITY_ORDER = case((Task.priority == "High", 0), (Task.priority == "Medium", 1), (Task.priority == "Low", 2))
+_PRIORITY_RANK = {"High": 0, "Medium": 1, "Low": 2}
 
 
 def create_task(
@@ -59,6 +59,6 @@ def list_tasks(db: Session, status: str = "all", q: str | None = None) -> list[T
     if q:
         stmt = stmt.where(Task.description.ilike(f"%{q}%"))
 
-    stmt = stmt.order_by(_PRIORITY_ORDER)
-
-    return list(db.execute(stmt).scalars().all())
+    tasks = list(db.execute(stmt).scalars().all())
+    tasks.sort(key=lambda task: _PRIORITY_RANK.get(task.priority, len(_PRIORITY_RANK)))
+    return tasks

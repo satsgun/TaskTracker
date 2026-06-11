@@ -49,8 +49,9 @@ class TestMarkAsComplete:
     def test_marking_complete_does_not_change_description(self):
         task = _create_task(description="Renew passport")
 
-        client.patch(f"/tasks/{task['id']}/", json={"status": "Complete"})
+        response = client.patch(f"/tasks/{task['id']}/", json={"status": "Complete"})
 
+        assert response.status_code == 204
         listed = client.get("/tasks/list").json()
         updated = next(t for t in listed if t["id"] == task["id"])
         assert updated["description"] == "Renew passport"

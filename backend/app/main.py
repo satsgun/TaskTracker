@@ -1,5 +1,6 @@
 import os
 from pathlib import Path
+from typing import Literal
 
 from fastapi import Depends, FastAPI, status
 from fastapi.staticfiles import StaticFiles
@@ -22,6 +23,13 @@ def health() -> dict[str, str]:
 @app.post("/tasks/", response_model=TaskOut, status_code=status.HTTP_201_CREATED)
 def add_task(task: TaskCreate, db: Session = Depends(get_db)) -> TaskOut:
     return crud.create_task(db, description=task.description, priority=task.priority, due_date=task.due_date)
+
+
+@app.get("/tasks/list", response_model=list[TaskOut])
+def list_tasks(
+    status: Literal["pending", "all"] = "all", q: str | None = None, db: Session = Depends(get_db)
+) -> list[TaskOut]:
+    return crud.list_tasks(db, status=status, q=q)
 
 
 _DEFAULT_FRONTEND_DIST = Path(__file__).resolve().parents[2] / "frontend" / "dist"
