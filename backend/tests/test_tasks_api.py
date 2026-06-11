@@ -1,13 +1,8 @@
-import pytest
 from fastapi.testclient import TestClient
 
 from app.main import app
 
 client = TestClient(app)
-
-pytestmark = pytest.mark.xfail(
-    strict=True, reason="POST /tasks/ not yet implemented (see Task 25+)"
-)
 
 
 class TestAddTask:
