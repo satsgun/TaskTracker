@@ -1,7 +1,7 @@
 :root {
   --color-overdue: #c0392b;
   --color-complete: #1e8449;
-  --color-incomplete: #ca8a04;
+  --color-incomplete: #007fff;
   --color-bg: #f7f7f9;
   --color-surface: #ffffff;
   --color-border: #e2e2e7;
@@ -298,7 +298,6 @@ body {
 /* Action banner */
 
 .action-banner {
-  display: flex;
   align-items: center;
   gap: 0.75rem;
   background: var(--color-danger-bg);
@@ -306,6 +305,10 @@ body {
   border-radius: 8px;
   padding: 0.6rem 1rem;
   margin-bottom: 0.75rem;
+}
+
+.action-banner:not([hidden]) {
+  display: flex;
 }
 
 .action-banner .banner-message {
