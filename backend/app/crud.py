@@ -50,6 +50,24 @@ def update_task(db: Session, task_id: int, description: str) -> Task | None:
     return task
 
 
+def apply_update(
+    db: Session, task_id: int, description: str | None = None, status: str | None = None
+) -> Task | None:
+    task = db.get(Task, task_id)
+    if task is None:
+        return None
+
+    if description is not None:
+        task.description = description
+
+    if status is not None:
+        task.status = status
+
+    db.commit()
+    db.refresh(task)
+    return task
+
+
 def list_tasks(db: Session, status: str = "all", q: str | None = None) -> list[Task]:
     stmt = select(Task)
 

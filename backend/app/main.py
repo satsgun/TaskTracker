@@ -36,15 +36,9 @@ def list_tasks(
 
 @app.patch("/tasks/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)
 def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)) -> None:
-    if task.description is not None:
-        updated = crud.update_task(db, task_id, description=task.description)
-        if updated is None:
-            raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
-
-    if task.status is not None:
-        updated = crud.set_status(db, task_id, task.status)
-        if updated is None:
-            raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
+    updated = crud.apply_update(db, task_id, description=task.description, status=task.status)
+    if updated is None:
+        raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
 
 
 @app.delete("/tasks/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)
