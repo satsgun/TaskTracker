@@ -217,6 +217,24 @@ describe("View routing based on session", () => {
     expect(document.querySelector<HTMLElement>("#task-view")!.hidden).toBe(true);
   });
 
+  it("returns to the auth view when a task request returns 401", async () => {
+    vi.stubGlobal(
+      "fetch",
+      mockFetch({
+        "/auth/me": {
+          status: 200,
+          body: { id: 1, first_name: "Ada", last_name: "Lovelace", email: "ada@example.com", created_at: "2026-06-11T00:00:00Z" },
+        },
+        "/tasks/list": { status: 401, body: { detail: "Not authenticated" } },
+      }),
+    );
+    await loadApp();
+    await flushAsync();
+
+    expect(document.querySelector<HTMLElement>("#auth-view")!.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>("#task-view")!.hidden).toBe(true);
+  });
+
   it("shows the task view and hides the auth view when /auth/me returns the current user", async () => {
     vi.stubGlobal(
       "fetch",

@@ -63,7 +63,7 @@ def me(user: User = Depends(get_current_user)) -> UserOut:
 
 
 @app.post("/tasks/", response_model=TaskOut, status_code=status.HTTP_201_CREATED)
-def add_task(task: TaskCreate, db: Session = Depends(get_db)) -> TaskOut:
+def add_task(task: TaskCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> TaskOut:
     return crud.create_task(db, description=task.description, priority=task.priority, due_date=task.due_date)
 
 
@@ -72,19 +72,22 @@ def list_tasks(
     task_status: Literal["pending", "all"] = Query("all", alias="status"),
     q: str | None = None,
     db: Session = Depends(get_db),
+    user: User = Depends(get_current_user),
 ) -> list[TaskOut]:
     return crud.list_tasks(db, status=task_status, q=q)
 
 
 @app.patch("/tasks/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)
-def update_task(task_id: int, task: TaskUpdate, db: Session = Depends(get_db)) -> None:
+def update_task(
+    task_id: int, task: TaskUpdate, db: Session = Depends(get_db), user: User = Depends(get_current_user)
+) -> None:
     updated = crud.apply_update(db, task_id, description=task.description, status=task.status)
     if updated is None:
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
 
 
 @app.delete("/tasks/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)
-def delete_task(task_id: int, db: Session = Depends(get_db)) -> None:
+def delete_task(task_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> None:
     if not crud.delete_task(db, task_id):
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
 

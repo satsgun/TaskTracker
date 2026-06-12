@@ -278,7 +278,12 @@ async function init(): Promise<void> {
     }
 
     try {
-      const response = await fetch(`/tasks/list?${params.toString()}`);
+      const response = await fetch(`/tasks/list?${params.toString()}`, { credentials: "same-origin" });
+      if (response.status === 401) {
+        showAuthView();
+        return;
+      }
+
       if (!response.ok) {
         showErrorState();
         return;
@@ -313,7 +318,12 @@ async function init(): Promise<void> {
     onError: () => void,
   ): Promise<void> {
     try {
-      const response = await fetch(`/tasks/${id}/`, init);
+      const response = await fetch(`/tasks/${id}/`, { ...init, credentials: "same-origin" });
+      if (response.status === 401) {
+        showAuthView();
+        return;
+      }
+
       if (!response.ok) {
         onError();
         return;
@@ -341,6 +351,7 @@ async function init(): Promise<void> {
     try {
       const response = await fetch("/tasks/", {
         method: "POST",
+        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           description,
@@ -348,6 +359,11 @@ async function init(): Promise<void> {
           due_date: dueInput.value || null,
         }),
       });
+
+      if (response.status === 401) {
+        showAuthView();
+        return;
+      }
 
       const body = await response.json();
 

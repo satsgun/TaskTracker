@@ -1,11 +1,4 @@
-from fastapi.testclient import TestClient
-
-from app.main import app
-
-client = TestClient(app)
-
-
-def _create_task(**overrides):
+def _create_task(client, **overrides):
     payload = {"description": "Task"}
     payload.update(overrides)
     response = client.post("/tasks/", json=payload)
@@ -13,16 +6,16 @@ def _create_task(**overrides):
 
 
 class TestMarkAsComplete:
-    def test_mark_task_complete_returns_204(self):
-        task = _create_task(description="Buy milk")
+    def test_mark_task_complete_returns_204(self, client):
+        task = _create_task(client, description="Buy milk")
 
         response = client.patch(f"/tasks/{task['id']}/", json={"status": "Complete"})
 
         assert response.status_code == 204
         assert response.content == b""
 
-    def test_mark_task_complete_updates_status(self):
-        task = _create_task(description="Write report")
+    def test_mark_task_complete_updates_status(self, client):
+        task = _create_task(client, description="Write report")
 
         client.patch(f"/tasks/{task['id']}/", json={"status": "Complete"})
 
@@ -30,8 +23,8 @@ class TestMarkAsComplete:
         updated = next(t for t in listed if t["id"] == task["id"])
         assert updated["status"] == "Complete"
 
-    def test_mark_task_incomplete_returns_204_and_updates_status(self):
-        task = _create_task(description="Pay bills")
+    def test_mark_task_incomplete_returns_204_and_updates_status(self, client):
+        task = _create_task(client, description="Pay bills")
         client.patch(f"/tasks/{task['id']}/", json={"status": "Complete"})
 
         response = client.patch(f"/tasks/{task['id']}/", json={"status": "Incomplete"})
@@ -41,8 +34,8 @@ class TestMarkAsComplete:
         updated = next(t for t in listed if t["id"] == task["id"])
         assert updated["status"] == "Incomplete"
 
-    def test_marking_complete_does_not_change_description(self):
-        task = _create_task(description="Renew passport")
+    def test_marking_complete_does_not_change_description(self, client):
+        task = _create_task(client, description="Renew passport")
 
         response = client.patch(f"/tasks/{task['id']}/", json={"status": "Complete"})
 
@@ -51,22 +44,22 @@ class TestMarkAsComplete:
         updated = next(t for t in listed if t["id"] == task["id"])
         assert updated["description"] == "Renew passport"
 
-    def test_mark_nonexistent_task_returns_404(self):
+    def test_mark_nonexistent_task_returns_404(self, client):
         response = client.patch("/tasks/999999/", json={"status": "Complete"})
 
         assert response.status_code == 404
         assert "999999" in response.json()["detail"]
 
-    def test_invalid_status_value_returns_422(self):
-        task = _create_task(description="Schedule dentist")
+    def test_invalid_status_value_returns_422(self, client):
+        task = _create_task(client, description="Schedule dentist")
 
         response = client.patch(f"/tasks/{task['id']}/", json={"status": "Done"})
 
         assert response.status_code == 422
         assert "detail" in response.json()
 
-    def test_empty_body_returns_422(self):
-        task = _create_task(description="Water plants")
+    def test_empty_body_returns_422(self, client):
+        task = _create_task(client, description="Water plants")
 
         response = client.patch(f"/tasks/{task['id']}/", json={})
 

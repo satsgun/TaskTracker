@@ -66,3 +66,8 @@ def auth_client(db_session_factory):
 @pytest.fixture
 def second_auth_client(db_session_factory):
     return _signup_and_login("user-b@example.com")
+
+
+@pytest.fixture
+def client(db_session_factory):
+    return _signup_and_login("default-user@example.com")
