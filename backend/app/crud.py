@@ -57,7 +57,8 @@ def list_tasks(db: Session, status: str = "all", q: str | None = None) -> list[T
         stmt = stmt.where(Task.status == "Incomplete")
 
     if q:
-        stmt = stmt.where(Task.description.ilike(f"%{q}%"))
+        escaped = q.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        stmt = stmt.where(Task.description.ilike(f"%{escaped}%", escape="\\"))
 
     stmt = stmt.order_by(Task.id)
 
