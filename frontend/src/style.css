@@ -49,7 +49,7 @@ body {
 }
 
 #app {
-  max-width: 720px;
+  max-width: 960px;
   margin: 0 auto;
   padding: 1.5rem 1rem 4rem;
 }
@@ -114,8 +114,8 @@ body {
 }
 
 .add-task-form {
-  display: grid;
-  grid-template-columns: 1fr auto auto auto;
+  display: flex;
+  flex-wrap: wrap;
   gap: 0.75rem;
   align-items: start;
 }
@@ -124,6 +124,20 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  flex: 2 1 220px;
+  min-width: 0;
+}
+
+.form-field--priority {
+  flex: 0 1 130px;
+}
+
+.form-field--due-date {
+  flex: 0 1 150px;
+}
+
+.add-task-form > .btn {
+  flex: 0 0 auto;
 }
 
 .form-field label {
@@ -374,6 +388,27 @@ body {
   display: flex;
   flex-direction: column;
   gap: 0.2rem;
+}
+
+.task-main--editing {
+  flex-direction: row;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.task-edit-input {
+  flex: 1;
+  min-width: 0;
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
+.task-edit-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
 }
 
 .task-description {
