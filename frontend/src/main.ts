@@ -201,6 +201,25 @@ function init(): void {
     actionBannerEl!.hidden = false;
   }
 
+  async function patchTask(
+    id: number,
+    init: RequestInit,
+    onSuccess: () => void,
+    onError: () => void,
+  ): Promise<void> {
+    try {
+      const response = await fetch(`/tasks/${id}/`, init);
+      if (!response.ok) {
+        onError();
+        return;
+      }
+
+      onSuccess();
+    } catch {
+      onError();
+    }
+  }
+
   bannerDismissBtn.addEventListener("click", () => {
     actionBannerEl!.hidden = true;
   });
@@ -279,41 +298,29 @@ function init(): void {
 
     if (target.closest(".icon-btn--complete")) {
       const newStatus = task.status === "Complete" ? "Incomplete" : "Complete";
-      void (async () => {
-        try {
-          const response = await fetch(`/tasks/${id}/`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ status: newStatus }),
-          });
-
-          if (!response.ok) {
-            showBanner(`Couldn't update "${task.description}". Please try again.`);
-            return;
-          }
-
+      void patchTask(
+        id,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus }),
+        },
+        () => {
           task.status = newStatus;
           render();
-        } catch {
-          showBanner(`Couldn't update "${task.description}". Please try again.`);
-        }
-      })();
+        },
+        () => showBanner(`Couldn't update "${task.description}". Please try again.`),
+      );
     } else if (target.closest(".icon-btn--delete")) {
-      void (async () => {
-        try {
-          const response = await fetch(`/tasks/${id}/`, { method: "DELETE" });
-
-          if (!response.ok) {
-            showBanner(`Couldn't delete "${task.description}". Please try again.`);
-            return;
-          }
-
+      void patchTask(
+        id,
+        { method: "DELETE" },
+        () => {
           tasks = tasks.filter((t) => t.id !== id);
           render();
-        } catch {
-          showBanner(`Couldn't delete "${task.description}". Please try again.`);
-        }
-      })();
+        },
+        () => showBanner(`Couldn't delete "${task.description}". Please try again.`),
+      );
     } else if (target.closest(".icon-btn--edit")) {
       editingId = editingId === id ? null : id;
       render();
@@ -326,30 +333,24 @@ function init(): void {
         return;
       }
 
-      void (async () => {
-        try {
-          const response = await fetch(`/tasks/${id}/`, {
-            method: "PATCH",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ description: newDescription }),
-          });
-
-          editingId = null;
-
-          if (!response.ok) {
-            showBanner(`Couldn't update "${task.description}". Please try again.`);
-            render();
-            return;
-          }
-
+      void patchTask(
+        id,
+        {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ description: newDescription }),
+        },
+        () => {
           task.description = newDescription;
+          editingId = null;
           render();
-        } catch {
+        },
+        () => {
           editingId = null;
           showBanner(`Couldn't update "${task.description}". Please try again.`);
           render();
-        }
-      })();
+        },
+      );
     } else if (target.closest(".btn-cancel")) {
       editingId = null;
       render();
