@@ -8,7 +8,8 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.database import Base, engine, get_db
-from app.schemas import TaskCreate, TaskOut, TaskUpdate
+from app.schemas import TaskCreate, TaskOut, TaskUpdate, UserCreate, UserOut
+from app.security import hash_password
 
 Base.metadata.create_all(bind=engine)
 
@@ -18,6 +19,20 @@ app = FastAPI(title="Task Tracker")
 @app.get("/health")
 def health() -> dict[str, str]:
     return {"status": "ok"}
+
+
+@app.post("/auth/signup", response_model=UserOut, status_code=status.HTTP_201_CREATED)
+def signup(user: UserCreate, db: Session = Depends(get_db)) -> UserOut:
+    if crud.get_user_by_email(db, user.email) is not None:
+        raise HTTPException(status_code=status.HTTP_409_CONFLICT, detail="Email already registered")
+
+    return crud.create_user(
+        db,
+        first_name=user.first_name,
+        last_name=user.last_name,
+        email=user.email,
+        hashed_password=hash_password(user.password),
+    )
 
 
 @app.post("/tasks/", response_model=TaskOut, status_code=status.HTTP_201_CREATED)

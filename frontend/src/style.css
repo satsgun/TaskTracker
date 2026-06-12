@@ -65,6 +65,38 @@ body {
   border: 0;
 }
 
+/* Auth */
+
+.auth-view {
+  display: flex;
+  justify-content: center;
+  padding: 2rem 0;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  width: 100%;
+  max-width: 320px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+  padding: 1.5rem;
+}
+
+.auth-form h2 {
+  margin: 0 0 0.5rem;
+  font-size: 1.25rem;
+}
+
+.auth-form input {
+  padding: 0.5rem;
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+  font-size: 1rem;
+}
+
 /* Header */
 
 .app-header {

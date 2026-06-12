@@ -1,3 +1,4 @@
+import { signup } from "./auth";
 import { renderCounter, renderTaskList } from "./render";
 import type { Priority, StatusFilter, Task } from "./types";
 
@@ -40,8 +41,41 @@ function initTheme(): void {
   });
 }
 
+function initSignupForm(): void {
+  const signupForm = document.querySelector<HTMLFormElement>("#signup-form");
+  const firstNameInput = document.querySelector<HTMLInputElement>('#signup-form input[name="first_name"]');
+  const lastNameInput = document.querySelector<HTMLInputElement>('#signup-form input[name="last_name"]');
+  const emailInput = document.querySelector<HTMLInputElement>('#signup-form input[name="email"]');
+  const passwordInput = document.querySelector<HTMLInputElement>('#signup-form input[name="password"]');
+  const errorEl = document.querySelector<HTMLElement>("#signup-error");
+
+  if (!signupForm || !firstNameInput || !lastNameInput || !emailInput || !passwordInput || !errorEl) {
+    return;
+  }
+
+  signupForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const result = await signup(
+      firstNameInput.value,
+      lastNameInput.value,
+      emailInput.value,
+      passwordInput.value,
+    );
+
+    if (!result.ok) {
+      errorEl.textContent = result.error ?? "Something went wrong. Please try again.";
+      errorEl.hidden = false;
+      return;
+    }
+
+    errorEl.hidden = true;
+  });
+}
+
 function init(): void {
   initTheme();
+  initSignupForm();
 
   const form = document.querySelector<HTMLFormElement>("#add-task-form");
   const descriptionInput = document.querySelector<HTMLInputElement>('input[name="description"]');

@@ -44,3 +44,41 @@ class TaskOut(BaseModel):
     due_date: date | None
     status: str
     created_at: datetime
+
+
+class UserCreate(BaseModel):
+    first_name: str
+    last_name: str
+    email: str
+    password: str
+
+    @field_validator("first_name", "last_name")
+    @classmethod
+    def name_must_not_be_blank(cls, value: str) -> str:
+        if not value.strip():
+            raise ValueError("name must not be empty")
+        return value
+
+    @field_validator("email")
+    @classmethod
+    def email_must_be_valid(cls, value: str) -> str:
+        if "@" not in value or not value.strip():
+            raise ValueError("email must be valid")
+        return value
+
+    @field_validator("password")
+    @classmethod
+    def password_must_meet_minimum_length(cls, value: str) -> str:
+        if len(value) < 8:
+            raise ValueError("password must be at least 8 characters")
+        return value
+
+
+class UserOut(BaseModel):
+    model_config = ConfigDict(from_attributes=True)
+
+    id: int
+    first_name: str
+    last_name: str
+    email: str
+    created_at: datetime
