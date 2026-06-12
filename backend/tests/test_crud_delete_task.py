@@ -10,12 +10,20 @@ def _make_session():
     return SessionLocal()
 
 
+def _create_user(db):
+    from app.crud import create_user
+
+    return create_user(db, first_name="Test", last_name="User", email="user@example.com", hashed_password="hashed")
+
+
 class TestDeleteTask:
     def test_delete_existing_task_returns_true(self):
         from app.crud import create_task, delete_task
 
         db = _make_session()
-        task = create_task(db, description="Buy milk")
+
+        user = _create_user(db)
+        task = create_task(db, description="Buy milk", user_id=user.id)
 
         assert delete_task(db, task.id) is True
 
@@ -23,7 +31,9 @@ class TestDeleteTask:
         from app.crud import create_task, delete_task, list_tasks
 
         db = _make_session()
-        task = create_task(db, description="Write report")
+
+        user = _create_user(db)
+        task = create_task(db, description="Write report", user_id=user.id)
 
         delete_task(db, task.id)
 
@@ -35,13 +45,17 @@ class TestDeleteTask:
 
         db = _make_session()
 
+        user = _create_user(db)
+
         assert delete_task(db, 999999) is False
 
     def test_delete_already_deleted_task_returns_false(self):
         from app.crud import create_task, delete_task
 
         db = _make_session()
-        task = create_task(db, description="Pay bills")
+
+        user = _create_user(db)
+        task = create_task(db, description="Pay bills", user_id=user.id)
         delete_task(db, task.id)
 
         assert delete_task(db, task.id) is False
@@ -50,8 +64,10 @@ class TestDeleteTask:
         from app.crud import create_task, delete_task, list_tasks
 
         db = _make_session()
-        keep = create_task(db, description="Renew passport")
-        remove = create_task(db, description="Schedule dentist")
+
+        user = _create_user(db)
+        keep = create_task(db, description="Renew passport", user_id=user.id)
+        remove = create_task(db, description="Schedule dentist", user_id=user.id)
 
         delete_task(db, remove.id)
 

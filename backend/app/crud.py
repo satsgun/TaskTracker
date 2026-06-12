@@ -46,9 +46,14 @@ def delete_session(db: Session, session_id: str) -> None:
 
 
 def create_task(
-    db: Session, description: str, priority: str | None = None, due_date: date | None = None
+    db: Session,
+    description: str,
+    priority: str | None = None,
+    due_date: date | None = None,
+    *,
+    user_id: int,
 ) -> Task:
-    task = Task(description=description, due_date=due_date)
+    task = Task(description=description, due_date=due_date, user_id=user_id)
     if priority is not None:
         task.priority = priority
     db.add(task)

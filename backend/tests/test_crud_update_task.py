@@ -10,12 +10,20 @@ def _make_session():
     return SessionLocal()
 
 
+def _create_user(db):
+    from app.crud import create_user
+
+    return create_user(db, first_name="Test", last_name="User", email="user@example.com", hashed_password="hashed")
+
+
 class TestUpdateTaskDescription:
     def test_update_description_changes_description(self):
         from app.crud import create_task, update_task
 
         db = _make_session()
-        task = create_task(db, description="Buy milk")
+
+        user = _create_user(db)
+        task = create_task(db, description="Buy milk", user_id=user.id)
 
         updated = update_task(db, task.id, description="Buy oat milk")
 
@@ -25,7 +33,9 @@ class TestUpdateTaskDescription:
         from app.crud import create_task, set_status, update_task
 
         db = _make_session()
-        task = create_task(db, description="Pay bills")
+
+        user = _create_user(db)
+        task = create_task(db, description="Pay bills", user_id=user.id)
         set_status(db, task.id, "Complete")
 
         updated = update_task(db, task.id, description="Pay rent and bills")
@@ -38,7 +48,9 @@ class TestUpdateTaskDescription:
         from app.crud import create_task, update_task
 
         db = _make_session()
-        task = create_task(db, description="Submit report", priority="High", due_date=date(2026, 7, 1))
+
+        user = _create_user(db)
+        task = create_task(db, description="Submit report", priority="High", due_date=date(2026, 7, 1), user_id=user.id)
 
         updated = update_task(db, task.id, description="Submit final report")
 
@@ -49,7 +61,9 @@ class TestUpdateTaskDescription:
         from app.crud import create_task, list_tasks, update_task
 
         db = _make_session()
-        task = create_task(db, description="Write report")
+
+        user = _create_user(db)
+        task = create_task(db, description="Write report", user_id=user.id)
 
         update_task(db, task.id, description="Write quarterly report")
 
@@ -61,5 +75,7 @@ class TestUpdateTaskDescription:
         from app.crud import update_task
 
         db = _make_session()
+
+        user = _create_user(db)
 
         assert update_task(db, 999999, description="Anything") is None

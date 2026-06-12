@@ -10,12 +10,20 @@ def _make_session():
     return SessionLocal()
 
 
+def _create_user(db):
+    from app.crud import create_user
+
+    return create_user(db, first_name="Test", last_name="User", email="user@example.com", hashed_password="hashed")
+
+
 class TestSetStatus:
     def test_set_status_to_complete_updates_status(self):
         from app.crud import create_task, set_status
 
         db = _make_session()
-        task = create_task(db, description="Buy milk")
+
+        user = _create_user(db)
+        task = create_task(db, description="Buy milk", user_id=user.id)
 
         updated = set_status(db, task.id, "Complete")
 
@@ -25,7 +33,9 @@ class TestSetStatus:
         from app.crud import create_task, set_status
 
         db = _make_session()
-        task = create_task(db, description="Pay bills")
+
+        user = _create_user(db)
+        task = create_task(db, description="Pay bills", user_id=user.id)
         set_status(db, task.id, "Complete")
 
         updated = set_status(db, task.id, "Incomplete")
@@ -36,7 +46,9 @@ class TestSetStatus:
         from app.crud import create_task, set_status
 
         db = _make_session()
-        task = create_task(db, description="Renew passport")
+
+        user = _create_user(db)
+        task = create_task(db, description="Renew passport", user_id=user.id)
 
         updated = set_status(db, task.id, "Complete")
 
@@ -46,7 +58,9 @@ class TestSetStatus:
         from app.crud import create_task, list_tasks, set_status
 
         db = _make_session()
-        task = create_task(db, description="Write report")
+
+        user = _create_user(db)
+        task = create_task(db, description="Write report", user_id=user.id)
 
         set_status(db, task.id, "Complete")
 
@@ -58,5 +72,7 @@ class TestSetStatus:
         from app.crud import set_status
 
         db = _make_session()
+
+        user = _create_user(db)
 
         assert set_status(db, 999999, "Complete") is None

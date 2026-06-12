@@ -10,6 +10,12 @@ def _make_session():
     return SessionLocal()
 
 
+def _create_user(db):
+    from app.crud import create_user
+
+    return create_user(db, first_name="Test", last_name="User", email="user@example.com", hashed_password="hashed")
+
+
 def _complete(db, task):
     task.status = "Complete"
     db.commit()
@@ -23,13 +29,17 @@ class TestListTasks:
 
         db = _make_session()
 
+        user = _create_user(db)
+
         assert list_tasks(db) == []
 
     def test_list_tasks_includes_created_tasks(self):
         from app.crud import create_task, list_tasks
 
         db = _make_session()
-        created = create_task(db, description="Buy milk")
+
+        user = _create_user(db)
+        created = create_task(db, description="Buy milk", user_id=user.id)
 
         tasks = list_tasks(db)
 
@@ -39,8 +49,10 @@ class TestListTasks:
         from app.crud import create_task, list_tasks
 
         db = _make_session()
-        incomplete = create_task(db, description="Write report")
-        complete = _complete(db, create_task(db, description="Pay bills"))
+
+        user = _create_user(db)
+        incomplete = create_task(db, description="Write report", user_id=user.id)
+        complete = _complete(db, create_task(db, description="Pay bills", user_id=user.id))
 
         ids = [t.id for t in list_tasks(db)]
 
@@ -51,8 +63,10 @@ class TestListTasks:
         from app.crud import create_task, list_tasks
 
         db = _make_session()
-        incomplete = create_task(db, description="Water plants")
-        complete = _complete(db, create_task(db, description="Renew passport"))
+
+        user = _create_user(db)
+        incomplete = create_task(db, description="Water plants", user_id=user.id)
+        complete = _complete(db, create_task(db, description="Renew passport", user_id=user.id))
 
         ids = [t.id for t in list_tasks(db, status="pending")]
 
@@ -63,7 +77,9 @@ class TestListTasks:
         from app.crud import create_task, list_tasks
 
         db = _make_session()
-        complete = _complete(db, create_task(db, description="File taxes"))
+
+        user = _create_user(db)
+        complete = _complete(db, create_task(db, description="File taxes", user_id=user.id))
 
         ids = [t.id for t in list_tasks(db, status="all")]
 
@@ -73,8 +89,10 @@ class TestListTasks:
         from app.crud import create_task, list_tasks
 
         db = _make_session()
-        match = create_task(db, description="Buy groceries")
-        other = create_task(db, description="Schedule dentist")
+
+        user = _create_user(db)
+        match = create_task(db, description="Buy groceries", user_id=user.id)
+        other = create_task(db, description="Schedule dentist", user_id=user.id)
 
         ids = [t.id for t in list_tasks(db, q="GROCER")]
 
@@ -85,7 +103,9 @@ class TestListTasks:
         from app.crud import create_task, list_tasks
 
         db = _make_session()
-        create_task(db, description="Buy groceries")
+
+        user = _create_user(db)
+        create_task(db, description="Buy groceries", user_id=user.id)
 
         assert list_tasks(db, q="no-such-task-zzz") == []
 
@@ -93,8 +113,10 @@ class TestListTasks:
         from app.crud import create_task, list_tasks
 
         db = _make_session()
-        match = create_task(db, description="50%_off everything")
-        other = create_task(db, description="50X off everything")
+
+        user = _create_user(db)
+        match = create_task(db, description="50%_off everything", user_id=user.id)
+        other = create_task(db, description="50X off everything", user_id=user.id)
 
         ids = [t.id for t in list_tasks(db, q="50%_off")]
 
@@ -105,8 +127,10 @@ class TestListTasks:
         from app.crud import create_task, list_tasks
 
         db = _make_session()
-        incomplete_match = create_task(db, description="Buy stamps")
-        complete_match = _complete(db, create_task(db, description="Buy a gift"))
+
+        user = _create_user(db)
+        incomplete_match = create_task(db, description="Buy stamps", user_id=user.id)
+        complete_match = _complete(db, create_task(db, description="Buy a gift", user_id=user.id))
 
         ids = [t.id for t in list_tasks(db, status="pending", q="buy")]
 
@@ -117,9 +141,11 @@ class TestListTasks:
         from app.crud import create_task, list_tasks
 
         db = _make_session()
-        low = create_task(db, description="Low task", priority="Low")
-        high = create_task(db, description="High task", priority="High")
-        medium = create_task(db, description="Medium task", priority="Medium")
+
+        user = _create_user(db)
+        low = create_task(db, description="Low task", priority="Low", user_id=user.id)
+        high = create_task(db, description="High task", priority="High", user_id=user.id)
+        medium = create_task(db, description="Medium task", priority="Medium", user_id=user.id)
 
         ids = [t.id for t in list_tasks(db)]
 

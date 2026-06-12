@@ -10,13 +10,21 @@ def _make_session():
     return SessionLocal()
 
 
+def _create_user(db):
+    from app.crud import create_user
+
+    return create_user(db, first_name="Test", last_name="User", email="user@example.com", hashed_password="hashed")
+
+
 class TestCreateTask:
     def test_create_task_with_required_fields_only_uses_defaults(self):
         from app.crud import create_task
 
         db = _make_session()
 
-        task = create_task(db, description="Buy milk")
+        user = _create_user(db)
+
+        task = create_task(db, description="Buy milk", user_id=user.id)
 
         assert task.description == "Buy milk"
         assert task.priority == "Medium"
@@ -30,8 +38,10 @@ class TestCreateTask:
 
         db = _make_session()
 
+        user = _create_user(db)
+
         task = create_task(
-            db, description="Submit report", priority="High", due_date=date(2026, 7, 1)
+            db, description="Submit report", priority="High", due_date=date(2026, 7, 1), user_id=user.id
         )
 
         assert task.description == "Submit report"
@@ -44,7 +54,9 @@ class TestCreateTask:
 
         db = _make_session()
 
-        task = create_task(db, description="Buy milk")
+        user = _create_user(db)
+
+        task = create_task(db, description="Buy milk", user_id=user.id)
 
         assert task.id is not None
 
@@ -53,7 +65,9 @@ class TestCreateTask:
 
         db = _make_session()
 
-        task = create_task(db, description="Buy milk")
+        user = _create_user(db)
+
+        task = create_task(db, description="Buy milk", user_id=user.id)
 
         assert task.created_at is not None
 
@@ -62,8 +76,10 @@ class TestCreateTask:
 
         db = _make_session()
 
-        first = create_task(db, description="First task")
-        second = create_task(db, description="Second task")
+        user = _create_user(db)
+
+        first = create_task(db, description="First task", user_id=user.id)
+        second = create_task(db, description="Second task", user_id=user.id)
 
         assert first.id != second.id
 
@@ -75,7 +91,9 @@ class TestCreateTask:
 
         db = _make_session()
 
-        created = create_task(db, description="Buy milk")
+        user = _create_user(db)
+
+        created = create_task(db, description="Buy milk", user_id=user.id)
 
         stored = db.execute(select(Task).where(Task.id == created.id)).scalar_one()
         assert stored.description == "Buy milk"

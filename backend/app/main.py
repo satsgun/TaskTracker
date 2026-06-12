@@ -64,7 +64,9 @@ def me(user: User = Depends(get_current_user)) -> UserOut:
 
 @app.post("/tasks/", response_model=TaskOut, status_code=status.HTTP_201_CREATED)
 def add_task(task: TaskCreate, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> TaskOut:
-    return crud.create_task(db, description=task.description, priority=task.priority, due_date=task.due_date)
+    return crud.create_task(
+        db, description=task.description, priority=task.priority, due_date=task.due_date, user_id=user.id
+    )
 
 
 @app.get("/tasks/list", response_model=list[TaskOut])

@@ -1,6 +1,8 @@
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 
 from app.main import app
+from app.models import Task
 
 
 class TestRouteProtection:
@@ -31,3 +33,37 @@ class TestRouteProtection:
         response = anon.delete("/tasks/1/")
 
         assert response.status_code == 401
+
+
+class TestTaskAttribution:
+    def test_add_task_without_session_creates_no_row(self, db_session):
+        anon = TestClient(app)
+
+        anon.post("/tasks/", json={"description": "Buy milk"})
+
+        assert db_session.execute(select(Task)).scalars().all() == []
+
+    def test_add_task_attributes_to_session_user(self, auth_client, db_session):
+        response = auth_client.post("/tasks/", json={"description": "Buy milk"})
+        task_id = response.json()["id"]
+
+        me = auth_client.get("/auth/me").json()
+
+        task = db_session.get(Task, task_id)
+        assert task.user_id == me["id"]
+
+    def test_add_task_ignores_client_supplied_user_id(self, auth_client, db_session):
+        response = auth_client.post("/tasks/", json={"description": "Buy milk", "user_id": 999999})
+        task_id = response.json()["id"]
+
+        me = auth_client.get("/auth/me").json()
+
+        task = db_session.get(Task, task_id)
+        assert task.user_id == me["id"]
+        assert task.user_id != 999999
+
+    def test_task_user_id_is_non_null(self, auth_client, db_session):
+        auth_client.post("/tasks/", json={"description": "Buy milk"})
+
+        task = db_session.execute(select(Task)).scalars().one()
+        assert task.user_id is not None
