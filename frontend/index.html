@@ -56,8 +56,9 @@
         <li class="legend-item legend-item--incomplete">Incomplete, not overdue</li>
       </ul>
 
-      <div id="error-state" class="state-panel" hidden>
-        <p>Something went wrong loading your tasks.</p>
+      <div id="error-state" class="state-panel state-panel--error" hidden>
+        <p class="state-panel-title">Couldn't load your tasks</p>
+        <p class="state-panel-subtitle">Check your connection and try again.</p>
         <button type="button" id="retry-btn" class="btn btn-primary">Retry</button>
       </div>
 

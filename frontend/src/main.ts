@@ -92,14 +92,17 @@ function init(): void {
   function renderEmptyState(): void {
     emptyStateEl!.innerHTML = "";
 
-    const message = document.createElement("p");
+    const title = document.createElement("p");
+    title.className = "state-panel-title";
+    const subtitle = document.createElement("p");
+    subtitle.className = "state-panel-subtitle";
     const isFiltered = searchQuery !== "" || statusFilter !== "all";
 
     if (isFiltered) {
-      message.textContent = searchQuery
-        ? `No tasks match "${searchQuery}".`
-        : "No tasks match the current filter.";
-      emptyStateEl!.appendChild(message);
+      title.textContent = searchQuery ? `No tasks match "${searchQuery}"` : "No tasks match the current filter";
+      subtitle.textContent = "Try a different keyword, or switch the filter to All.";
+      emptyStateEl!.appendChild(title);
+      emptyStateEl!.appendChild(subtitle);
 
       const clearBtn = document.createElement("button");
       clearBtn.type = "button";
@@ -118,8 +121,10 @@ function init(): void {
       filterBarEl!.hidden = false;
       legendEl!.hidden = false;
     } else {
-      message.textContent = "No tasks yet. Add one above to get started!";
-      emptyStateEl!.appendChild(message);
+      title.textContent = "No tasks yet";
+      subtitle.textContent = "Add your first task above to get started.";
+      emptyStateEl!.appendChild(title);
+      emptyStateEl!.appendChild(subtitle);
 
       filterBarEl!.hidden = true;
       legendEl!.hidden = true;
