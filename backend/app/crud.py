@@ -59,6 +59,8 @@ def list_tasks(db: Session, status: str = "all", q: str | None = None) -> list[T
     if q:
         stmt = stmt.where(Task.description.ilike(f"%{q}%"))
 
+    stmt = stmt.order_by(Task.id)
+
     tasks = list(db.execute(stmt).scalars().all())
     tasks.sort(key=lambda task: _PRIORITY_RANK.get(task.priority, len(_PRIORITY_RANK)))
     return tasks
