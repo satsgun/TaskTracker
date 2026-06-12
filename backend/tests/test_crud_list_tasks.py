@@ -89,6 +89,18 @@ class TestListTasks:
 
         assert list_tasks(db, q="no-such-task-zzz") == []
 
+    def test_search_treats_percent_and_underscore_as_literal_characters(self):
+        from app.crud import create_task, list_tasks
+
+        db = _make_session()
+        match = create_task(db, description="50%_off everything")
+        other = create_task(db, description="50X off everything")
+
+        ids = [t.id for t in list_tasks(db, q="50%_off")]
+
+        assert match.id in ids
+        assert other.id not in ids
+
     def test_combined_status_and_search(self):
         from app.crud import create_task, list_tasks
 
