@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Literal
 
-from fastapi import Depends, FastAPI, HTTPException, status
+from fastapi import Depends, FastAPI, HTTPException, Query, status
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
@@ -27,9 +27,11 @@ def add_task(task: TaskCreate, db: Session = Depends(get_db)) -> TaskOut:
 
 @app.get("/tasks/list", response_model=list[TaskOut])
 def list_tasks(
-    status: Literal["pending", "all"] = "all", q: str | None = None, db: Session = Depends(get_db)
+    task_status: Literal["pending", "all"] = Query("all", alias="status"),
+    q: str | None = None,
+    db: Session = Depends(get_db),
 ) -> list[TaskOut]:
-    return crud.list_tasks(db, status=status, q=q)
+    return crud.list_tasks(db, status=task_status, q=q)
 
 
 @app.patch("/tasks/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)
