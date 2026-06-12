@@ -15,6 +15,14 @@
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
+:root[data-theme="dark"] {
+  --color-bg: #14161a;
+  --color-surface: #1f2329;
+  --color-border: #333844;
+  --color-text: #e5e7eb;
+  --color-muted: #9ca3af;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -23,6 +31,7 @@ body {
   margin: 0;
   background: var(--color-bg);
   color: var(--color-text);
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 #app {
@@ -56,10 +65,28 @@ body {
   margin: 0;
 }
 
+.header-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .task-counter {
   margin: 0;
   color: var(--color-muted);
   font-size: 0.9rem;
+}
+
+.theme-toggle {
+  border: 1px solid var(--color-border);
+  background: var(--color-surface);
+  border-radius: 6px;
+  width: 2.25rem;
+  height: 2.25rem;
+  font-size: 1.1rem;
+  line-height: 1;
+  cursor: pointer;
+  color: var(--color-text);
 }
 
 /* Add task form */

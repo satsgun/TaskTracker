@@ -17,6 +17,14 @@ describe("index.html structure", () => {
     expect(document.querySelector("#task-counter")?.textContent).toMatch(/\d+ tasks? · \d+ pending/);
   });
 
+  it("renders a theme toggle button", () => {
+    const toggle = document.querySelector<HTMLButtonElement>("#theme-toggle");
+
+    expect(toggle).not.toBeNull();
+    expect(toggle?.getAttribute("type")).toBe("button");
+    expect(toggle?.getAttribute("aria-pressed")).toBe("false");
+  });
+
   it("renders the add task form with the required fields", () => {
     const form = document.querySelector("#add-task-form");
 

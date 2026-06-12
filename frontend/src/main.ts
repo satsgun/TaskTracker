@@ -1,7 +1,48 @@
 import { renderCounter, renderTaskList } from "./render";
 import type { Priority, StatusFilter, Task } from "./types";
 
+const THEME_STORAGE_KEY = "theme";
+type Theme = "light" | "dark";
+
+function getPreferredTheme(): Theme {
+  const stored = localStorage.getItem(THEME_STORAGE_KEY);
+  if (stored === "light" || stored === "dark") {
+    return stored;
+  }
+
+  try {
+    return window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "light";
+  } catch {
+    return "light";
+  }
+}
+
+function applyTheme(theme: Theme, toggle: HTMLButtonElement | null): void {
+  document.documentElement.dataset.theme = theme;
+
+  if (toggle) {
+    toggle.textContent = theme === "dark" ? "☀️" : "🌙";
+    toggle.setAttribute("aria-pressed", String(theme === "dark"));
+    toggle.setAttribute("aria-label", theme === "dark" ? "Switch to light theme" : "Switch to dark theme");
+  }
+}
+
+function initTheme(): void {
+  const toggle = document.querySelector<HTMLButtonElement>("#theme-toggle");
+  let theme = getPreferredTheme();
+
+  applyTheme(theme, toggle);
+
+  toggle?.addEventListener("click", () => {
+    theme = theme === "dark" ? "light" : "dark";
+    localStorage.setItem(THEME_STORAGE_KEY, theme);
+    applyTheme(theme, toggle);
+  });
+}
+
 function init(): void {
+  initTheme();
+
   const form = document.querySelector<HTMLFormElement>("#add-task-form");
   const descriptionInput = document.querySelector<HTMLInputElement>('input[name="description"]');
   const priorityInput = document.querySelector<HTMLSelectElement>('select[name="priority"]');
