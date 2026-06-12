@@ -139,6 +139,11 @@ function init(): void {
   function render(): void {
     if (tasks.length === 0) {
       renderEmptyState();
+      // Only update the counter when there are truly no tasks at all (no
+      // search/filter applied). If a search or filter yields zero results,
+      // `tasks` holds that empty filtered set, so updating the counter here
+      // would overwrite it with "0 tasks" even though tasks still exist -
+      // leave the previous total displayed instead.
       if (searchQuery === "" && statusFilter === "all") {
         renderCounter(counter as HTMLElement, tasks);
       }
