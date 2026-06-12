@@ -21,7 +21,7 @@
           <div class="form-field form-field--description">
             <label for="description">Description</label>
             <input type="text" id="description" name="description" placeholder="What needs doing?" required />
-            <p class="field-error" id="description-error" hidden></p>
+            <p class="field-error" id="description-error" role="alert" hidden></p>
           </div>
           <div class="form-field form-field--priority">
             <label for="priority">Priority</label>
@@ -64,7 +64,7 @@
 
       <div id="empty-state" class="state-panel" hidden></div>
 
-      <div id="action-banner" class="action-banner" hidden>
+      <div id="action-banner" class="action-banner" aria-live="polite" hidden>
         <p class="banner-message"></p>
         <button type="button" class="banner-dismiss" aria-label="Dismiss">&times;</button>
       </div>
