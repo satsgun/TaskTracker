@@ -1,4 +1,4 @@
-import { signup } from "./auth";
+import { login, signup } from "./auth";
 import { renderCounter, renderTaskList } from "./render";
 import type { Priority, StatusFilter, Task } from "./types";
 
@@ -73,9 +73,57 @@ function initSignupForm(): void {
   });
 }
 
+function initLoginForm(): void {
+  const loginForm = document.querySelector<HTMLFormElement>("#login-form");
+  const emailInput = document.querySelector<HTMLInputElement>('#login-form input[name="email"]');
+  const passwordInput = document.querySelector<HTMLInputElement>('#login-form input[name="password"]');
+  const errorEl = document.querySelector<HTMLElement>("#login-error");
+
+  if (!loginForm || !emailInput || !passwordInput || !errorEl) {
+    return;
+  }
+
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const result = await login(emailInput.value, passwordInput.value);
+
+    if (!result.ok) {
+      errorEl.textContent = result.error ?? "Something went wrong. Please try again.";
+      errorEl.hidden = false;
+      return;
+    }
+
+    errorEl.hidden = true;
+  });
+}
+
+function initAuthToggle(): void {
+  const signupForm = document.querySelector<HTMLElement>("#signup-form");
+  const loginForm = document.querySelector<HTMLElement>("#login-form");
+  const showLoginBtn = document.querySelector<HTMLButtonElement>("#show-login");
+  const showSignupBtn = document.querySelector<HTMLButtonElement>("#show-signup");
+
+  if (!signupForm || !loginForm || !showLoginBtn || !showSignupBtn) {
+    return;
+  }
+
+  showLoginBtn.addEventListener("click", () => {
+    signupForm.hidden = true;
+    loginForm.hidden = false;
+  });
+
+  showSignupBtn.addEventListener("click", () => {
+    loginForm.hidden = true;
+    signupForm.hidden = false;
+  });
+}
+
 function init(): void {
   initTheme();
   initSignupForm();
+  initLoginForm();
+  initAuthToggle();
 
   const form = document.querySelector<HTMLFormElement>("#add-task-form");
   const descriptionInput = document.querySelector<HTMLInputElement>('input[name="description"]');

@@ -93,3 +93,60 @@ class TestSignup:
         )
 
         assert response.status_code == 422
+
+
+class TestLogin:
+    def _signup(self, email: str, password: str = "super-secret") -> None:
+        response = client.post(
+            "/auth/signup",
+            json={
+                "first_name": "Ada",
+                "last_name": "Lovelace",
+                "email": email,
+                "password": password,
+            },
+        )
+        assert response.status_code == 201
+
+    def test_login_with_correct_credentials_returns_200(self):
+        self._signup("login-ok@example.com", "correct-password")
+
+        response = client.post(
+            "/auth/login", json={"email": "login-ok@example.com", "password": "correct-password"}
+        )
+
+        assert response.status_code == 200
+        body = response.json()
+        assert body["email"] == "login-ok@example.com"
+        assert "password" not in body
+        assert "hashed_password" not in body
+
+    def test_login_with_wrong_password_returns_401_with_uniform_message(self):
+        self._signup("login-wrong-pw@example.com", "correct-password")
+
+        response = client.post(
+            "/auth/login", json={"email": "login-wrong-pw@example.com", "password": "wrong-password"}
+        )
+
+        assert response.status_code == 401
+        assert response.json() == {"detail": "Invalid email or password"}
+
+    def test_login_with_unregistered_email_returns_401_with_identical_body(self):
+        wrong_password_response = client.post(
+            "/auth/login", json={"email": "login-no-such-user@example.com", "password": "anything"}
+        )
+
+        self._signup("login-identical-check@example.com", "correct-password")
+        unregistered_response = client.post(
+            "/auth/login", json={"email": "login-does-not-exist@example.com", "password": "anything"}
+        )
+        wrong_password_for_real_user = client.post(
+            "/auth/login",
+            json={"email": "login-identical-check@example.com", "password": "incorrect"},
+        )
+
+        assert wrong_password_response.status_code == 401
+        assert unregistered_response.status_code == 401
+        assert wrong_password_for_real_user.status_code == 401
+        assert unregistered_response.json() == wrong_password_for_real_user.json()
+        assert unregistered_response.json() == {"detail": "Invalid email or password"}

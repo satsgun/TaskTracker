@@ -51,3 +51,42 @@ describe("signup", () => {
     expect(result).toEqual({ ok: false, error: "Email already registered" });
   });
 });
+
+describe("login", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("posts email and password to /auth/login with same-origin credentials", async () => {
+    const fetchMock = mockFetchResponse(200, {
+      id: 1,
+      first_name: "Ada",
+      last_name: "Lovelace",
+      email: "ada@example.com",
+      created_at: "2026-06-11T00:00:00Z",
+    });
+    vi.stubGlobal("fetch", fetchMock);
+
+    const { login } = await import("../src/auth");
+    const result = await login("ada@example.com", "super-secret");
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/auth/login",
+      expect.objectContaining({
+        method: "POST",
+        credentials: "same-origin",
+        body: JSON.stringify({ email: "ada@example.com", password: "super-secret" }),
+      }),
+    );
+    expect(result).toEqual({ ok: true });
+  });
+
+  it("returns ok:false with the uniform error message on a 401", async () => {
+    vi.stubGlobal("fetch", mockFetchResponse(401, { detail: "Invalid email or password" }));
+
+    const { login } = await import("../src/auth");
+    const result = await login("ada@example.com", "wrong-password");
+
+    expect(result).toEqual({ ok: false, error: "Invalid email or password" });
+  });
+});

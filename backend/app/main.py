@@ -8,8 +8,8 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.database import Base, engine, get_db
-from app.schemas import TaskCreate, TaskOut, TaskUpdate, UserCreate, UserOut
-from app.security import hash_password
+from app.schemas import TaskCreate, TaskOut, TaskUpdate, UserCreate, UserLogin, UserOut
+from app.security import hash_password, verify_password
 
 Base.metadata.create_all(bind=engine)
 
@@ -33,6 +33,15 @@ def signup(user: UserCreate, db: Session = Depends(get_db)) -> UserOut:
         email=user.email,
         hashed_password=hash_password(user.password),
     )
+
+
+@app.post("/auth/login", response_model=UserOut)
+def login(credentials: UserLogin, db: Session = Depends(get_db)) -> UserOut:
+    user = crud.get_user_by_email(db, credentials.email)
+    if user is None or not verify_password(credentials.password, user.hashed_password):
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
+
+    return user
 
 
 @app.post("/tasks/", response_model=TaskOut, status_code=status.HTTP_201_CREATED)
