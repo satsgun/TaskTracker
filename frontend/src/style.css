@@ -112,10 +112,6 @@ body {
   gap: 0.25rem;
 }
 
-.form-field--description {
-  grid-column: 1 / -1;
-}
-
 .form-field label {
   font-size: 0.8rem;
   color: var(--color-muted);
@@ -180,12 +176,16 @@ body {
   color: #fff;
 }
 
+.search-field {
+  flex: 1;
+}
+
 .search-field input {
+  width: 100%;
   padding: 0.4rem 0.75rem;
   border: 1px solid var(--color-border);
   border-radius: 6px;
   font-size: 0.9rem;
-  min-width: 14rem;
 }
 
 /* Legend */
@@ -302,8 +302,13 @@ body {
   font-size: 0.8rem;
 }
 
+.task-meta {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
 .priority-badge {
-  align-self: flex-start;
   font-size: 0.7rem;
   font-weight: 600;
   text-transform: uppercase;

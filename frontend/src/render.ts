@@ -49,8 +49,9 @@ function renderTaskRow(task: Task, today: Date, isEditing: boolean): HTMLLIEleme
 
   li.innerHTML = `
     <span class="task-accent"></span>
+    ${renderCompleteToggle(task)}
     ${isEditing ? renderEditMain(task) : renderDisplayMain(task, today)}
-    ${isEditing ? "" : renderActions(task)}
+    ${isEditing ? "" : renderTaskMeta(task)}
   `;
 
   return li;
@@ -66,7 +67,6 @@ function rowStateOf(task: Task, today: Date): "overdue" | "complete" | "incomple
 function renderDisplayMain(task: Task, today: Date): string {
   return `
     <div class="task-main">
-      <span class="priority-badge priority-badge--${task.priority.toLowerCase()}">${task.priority}</span>
       <p class="task-description">${escapeHtml(task.description)}</p>
       <p class="task-due">${formatDueLabel(task, today)}</p>
     </div>
@@ -85,13 +85,19 @@ function renderEditMain(task: Task): string {
   `;
 }
 
-function renderActions(task: Task): string {
+function renderCompleteToggle(task: Task): string {
   const isComplete = task.status === "Complete";
+  return `<button class="icon-btn icon-btn--complete" aria-label="${isComplete ? "Mark incomplete" : "Mark complete"}">${isComplete ? "●" : "○"}</button>`;
+}
+
+function renderTaskMeta(task: Task): string {
   return `
-    <div class="task-actions">
-      <button class="icon-btn icon-btn--complete" aria-label="${isComplete ? "Mark incomplete" : "Mark complete"}">${isComplete ? "●" : "○"}</button>
-      <button class="icon-btn icon-btn--edit" aria-label="Edit task">✎</button>
-      <button class="icon-btn icon-btn--delete" aria-label="Delete task">🗑</button>
+    <div class="task-meta">
+      <span class="priority-badge priority-badge--${task.priority.toLowerCase()}">${task.priority}</span>
+      <div class="task-actions">
+        <button class="icon-btn icon-btn--edit" aria-label="Edit task">✎</button>
+        <button class="icon-btn icon-btn--delete" aria-label="Delete task">🗑</button>
+      </div>
     </div>
   `;
 }
