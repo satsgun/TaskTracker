@@ -38,4 +38,4 @@ jobs:
 
           # Allow Claude to run the project's test suites
           claude_args: |
-            --allowedTools "Bash(cd backend && .venv/bin/pytest*),Bash(cd frontend && npm test*),Bash(cd frontend && npm run *)"
+            --allowedTools "Bash(cd backend && .venv/bin/pytest*),Bash(cd frontend && npm test*),Bash(cd frontend && npm run *),Bash(gh issue create:*)"
