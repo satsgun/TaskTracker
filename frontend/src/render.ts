@@ -1,12 +1,12 @@
 import { isOverdue, sortByPriority } from "./tasks";
 import type { Task } from "./types";
 
-export function formatDueLabel(task: Task, today: Date = new Date()): string {
+export function formatDueLabel(task: Task, today: Date = new Date(), locale: string = "en-US"): string {
   if (!task.due_date) {
     return "No due date";
   }
 
-  const formatted = formatDate(task.due_date);
+  const formatted = formatDate(task.due_date, locale);
 
   if (task.status === "Incomplete" && isOverdue(task, today)) {
     return `Overdue · ${formatted}`;
@@ -15,9 +15,9 @@ export function formatDueLabel(task: Task, today: Date = new Date()): string {
   return `Due ${formatted}`;
 }
 
-function formatDate(iso: string): string {
+function formatDate(iso: string, locale: string = "en-US"): string {
   const date = new Date(`${iso}T00:00:00Z`);
-  return new Intl.DateTimeFormat("en-US", { month: "short", day: "numeric", timeZone: "UTC" }).format(date);
+  return new Intl.DateTimeFormat(locale, { month: "short", day: "numeric", timeZone: "UTC" }).format(date);
 }
 
 export function renderCounter(el: HTMLElement, tasks: Task[]): void {
