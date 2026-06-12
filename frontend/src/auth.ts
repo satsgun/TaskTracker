@@ -3,6 +3,28 @@ export interface AuthResult {
   error?: string;
 }
 
+export interface CurrentUser {
+  id: number;
+  first_name: string;
+  last_name: string;
+  email: string;
+  created_at: string;
+}
+
+export async function getCurrentUser(): Promise<CurrentUser | null> {
+  try {
+    const response = await fetch("/auth/me", { credentials: "same-origin" });
+
+    if (!response.ok) {
+      return null;
+    }
+
+    return await response.json();
+  } catch {
+    return null;
+  }
+}
+
 export async function login(email: string, password: string): Promise<AuthResult> {
   try {
     const response = await fetch("/auth/login", {

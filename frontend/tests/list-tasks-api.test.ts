@@ -32,6 +32,26 @@ function lastFetchUrl(fetchMock: ReturnType<typeof vi.fn>): URL {
   return new URL(calls[calls.length - 1][0] as string, "http://localhost");
 }
 
+const AUTHENTICATED_USER = {
+  id: 1,
+  first_name: "Ada",
+  last_name: "Lovelace",
+  email: "ada@example.com",
+  created_at: "2026-06-11T00:00:00Z",
+};
+
+function mockFetch(handlers: Record<string, () => Promise<unknown>>) {
+  return vi.fn((url: string) => {
+    for (const [path, handler] of Object.entries(handlers)) {
+      if (url.startsWith(path)) {
+        return handler();
+      }
+    }
+
+    return Promise.resolve(jsonResponse(200, AUTHENTICATED_USER));
+  });
+}
+
 const SAMPLE_TASKS = [
   { id: 1, description: "Pay electricity bill", priority: "High", due_date: "2020-01-01", status: "Incomplete" },
   { id: 2, description: "Send invoice", priority: "Medium", due_date: "2020-01-01", status: "Complete" },
@@ -88,10 +108,13 @@ describe("List tasks (API-backed)", () => {
   });
 
   it("shows a no-matches empty state when a search returns no results, keeping filters visible", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockResolvedValueOnce(jsonResponse(200, SAMPLE_TASKS))
-      .mockResolvedValueOnce(jsonResponse(200, []));
+    let listCalls = 0;
+    const fetchMock = mockFetch({
+      "/tasks/list": () => {
+        listCalls += 1;
+        return Promise.resolve(jsonResponse(200, listCalls === 1 ? SAMPLE_TASKS : []));
+      },
+    });
     vi.stubGlobal("fetch", fetchMock);
 
     await loadApp();
@@ -115,7 +138,9 @@ describe("List tasks (API-backed)", () => {
   });
 
   it("shows a retry panel when the initial load fails with an HTTP error", async () => {
-    const fetchMock = vi.fn().mockResolvedValue(jsonResponse(500, { detail: "Internal Server Error" }));
+    const fetchMock = mockFetch({
+      "/tasks/list": () => Promise.resolve(jsonResponse(500, { detail: "Internal Server Error" })),
+    });
     vi.stubGlobal("fetch", fetchMock);
 
     await loadApp();
@@ -129,10 +154,16 @@ describe("List tasks (API-backed)", () => {
   });
 
   it("shows a retry panel on a network error and recovers when retry succeeds", async () => {
-    const fetchMock = vi
-      .fn()
-      .mockRejectedValueOnce(new TypeError("Failed to fetch"))
-      .mockResolvedValueOnce(jsonResponse(200, SAMPLE_TASKS));
+    let listCalls = 0;
+    const fetchMock = mockFetch({
+      "/tasks/list": () => {
+        listCalls += 1;
+        if (listCalls === 1) {
+          return Promise.reject(new TypeError("Failed to fetch"));
+        }
+        return Promise.resolve(jsonResponse(200, SAMPLE_TASKS));
+      },
+    });
     vi.stubGlobal("fetch", fetchMock);
 
     await loadApp();

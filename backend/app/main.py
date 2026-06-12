@@ -2,12 +2,15 @@ import os
 from pathlib import Path
 from typing import Literal
 
-from fastapi import Depends, FastAPI, HTTPException, Query, status
+from fastapi import Depends, FastAPI, HTTPException, Query, Response, status
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
 from app import crud
+from app.auth import get_current_user
+from app.config import COOKIE_SECURE, SESSION_COOKIE_NAME
 from app.database import Base, engine, get_db
+from app.models import User
 from app.schemas import TaskCreate, TaskOut, TaskUpdate, UserCreate, UserLogin, UserOut
 from app.security import hash_password, verify_password
 
@@ -36,11 +39,26 @@ def signup(user: UserCreate, db: Session = Depends(get_db)) -> UserOut:
 
 
 @app.post("/auth/login", response_model=UserOut)
-def login(credentials: UserLogin, db: Session = Depends(get_db)) -> UserOut:
+def login(credentials: UserLogin, response: Response, db: Session = Depends(get_db)) -> UserOut:
     user = crud.get_user_by_email(db, credentials.email)
     if user is None or not verify_password(credentials.password, user.hashed_password):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password")
 
+    session = crud.create_session(db, user_id=user.id)
+    response.set_cookie(
+        key=SESSION_COOKIE_NAME,
+        value=session.id,
+        httponly=True,
+        samesite="lax",
+        secure=COOKIE_SECURE,
+        path="/",
+    )
+
+    return user
+
+
+@app.get("/auth/me", response_model=UserOut)
+def me(user: User = Depends(get_current_user)) -> UserOut:
     return user
 
 

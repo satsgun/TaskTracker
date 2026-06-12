@@ -1,6 +1,10 @@
+from datetime import datetime, timedelta
+
 from fastapi.testclient import TestClient
+from sqlalchemy import select
 
 from app.main import app
+from app.models import AuthSession
 
 client = TestClient(app)
 
@@ -150,3 +154,73 @@ class TestLogin:
         assert wrong_password_for_real_user.status_code == 401
         assert unregistered_response.json() == wrong_password_for_real_user.json()
         assert unregistered_response.json() == {"detail": "Invalid email or password"}
+
+
+class TestLoginSession:
+    def test_login_sets_session_cookie(self):
+        signup = client.post(
+            "/auth/signup",
+            json={
+                "first_name": "Grace",
+                "last_name": "Hopper",
+                "email": "session-cookie@example.com",
+                "password": "super-secret",
+            },
+        )
+        assert signup.status_code == 201
+
+        response = client.post(
+            "/auth/login", json={"email": "session-cookie@example.com", "password": "super-secret"}
+        )
+
+        assert response.status_code == 200
+        assert "session_id" in response.cookies
+        assert "HttpOnly" in response.headers["set-cookie"]
+
+
+class TestMe:
+    def test_me_without_cookie_returns_401(self):
+        anon = TestClient(app)
+
+        response = anon.get("/auth/me")
+
+        assert response.status_code == 401
+
+    def test_me_with_valid_cookie_returns_current_user(self):
+        logged_in = TestClient(app)
+        logged_in.post(
+            "/auth/signup",
+            json={
+                "first_name": "Grace",
+                "last_name": "Hopper",
+                "email": "me-valid@example.com",
+                "password": "super-secret",
+            },
+        )
+        logged_in.post("/auth/login", json={"email": "me-valid@example.com", "password": "super-secret"})
+
+        response = logged_in.get("/auth/me")
+
+        assert response.status_code == 200
+        assert response.json()["email"] == "me-valid@example.com"
+
+    def test_me_after_idle_timeout_returns_401(self, db_session):
+        idle_client = TestClient(app)
+        idle_client.post(
+            "/auth/signup",
+            json={
+                "first_name": "Grace",
+                "last_name": "Hopper",
+                "email": "me-idle@example.com",
+                "password": "super-secret",
+            },
+        )
+        idle_client.post("/auth/login", json={"email": "me-idle@example.com", "password": "super-secret"})
+
+        session = db_session.execute(select(AuthSession)).scalars().one()
+        session.last_seen_at = datetime.utcnow() - timedelta(minutes=31)
+        db_session.commit()
+
+        response = idle_client.get("/auth/me")
+
+        assert response.status_code == 401

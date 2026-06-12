@@ -1,4 +1,4 @@
-import { login, signup } from "./auth";
+import { getCurrentUser, login, signup } from "./auth";
 import { renderCounter, renderTaskList } from "./render";
 import type { Priority, StatusFilter, Task } from "./types";
 
@@ -73,7 +73,7 @@ function initSignupForm(): void {
   });
 }
 
-function initLoginForm(): void {
+function initLoginForm(onSuccess: () => void): void {
   const loginForm = document.querySelector<HTMLFormElement>("#login-form");
   const emailInput = document.querySelector<HTMLInputElement>('#login-form input[name="email"]');
   const passwordInput = document.querySelector<HTMLInputElement>('#login-form input[name="password"]');
@@ -95,6 +95,7 @@ function initLoginForm(): void {
     }
 
     errorEl.hidden = true;
+    onSuccess();
   });
 }
 
@@ -119,11 +120,28 @@ function initAuthToggle(): void {
   });
 }
 
-function init(): void {
+async function init(): Promise<void> {
   initTheme();
   initSignupForm();
-  initLoginForm();
   initAuthToggle();
+
+  const authView = document.querySelector<HTMLElement>("#auth-view");
+  const taskView = document.querySelector<HTMLElement>("#task-view");
+
+  function showAuthView(): void {
+    if (authView) authView.hidden = false;
+    if (taskView) taskView.hidden = true;
+  }
+
+  function showTaskView(): void {
+    if (authView) authView.hidden = true;
+    if (taskView) taskView.hidden = false;
+  }
+
+  initLoginForm(() => {
+    showTaskView();
+    void fetchTasks();
+  });
 
   const form = document.querySelector<HTMLFormElement>("#add-task-form");
   const descriptionInput = document.querySelector<HTMLInputElement>('input[name="description"]');
@@ -444,7 +462,13 @@ function init(): void {
     }
   });
 
-  void fetchTasks();
+  const user = await getCurrentUser();
+  if (user) {
+    showTaskView();
+    void fetchTasks();
+  } else {
+    showAuthView();
+  }
 }
 
 if (typeof document !== "undefined") {

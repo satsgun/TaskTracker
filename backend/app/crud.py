@@ -1,9 +1,10 @@
-from datetime import date
+from datetime import date, datetime
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from app.models import Task, User
+from app.models import AuthSession, Task, User
+from app.security import generate_session_token
 
 _PRIORITY_RANK = {"High": 0, "Medium": 1, "Low": 2}
 
@@ -18,6 +19,30 @@ def create_user(db: Session, first_name: str, last_name: str, email: str, hashed
     db.commit()
     db.refresh(user)
     return user
+
+
+def create_session(db: Session, user_id: int) -> AuthSession:
+    session = AuthSession(id=generate_session_token(), user_id=user_id)
+    db.add(session)
+    db.commit()
+    db.refresh(session)
+    return session
+
+
+def get_session(db: Session, session_id: str) -> AuthSession | None:
+    return db.get(AuthSession, session_id)
+
+
+def touch_session(db: Session, session: AuthSession) -> None:
+    session.last_seen_at = datetime.utcnow()
+    db.commit()
+
+
+def delete_session(db: Session, session_id: str) -> None:
+    session = db.get(AuthSession, session_id)
+    if session is not None:
+        db.delete(session)
+        db.commit()
 
 
 def create_task(
