@@ -182,11 +182,14 @@ body {
 /* Filter bar */
 
 .filter-bar {
-  display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 0.75rem;
   margin-bottom: 0.75rem;
+}
+
+.filter-bar:not([hidden]) {
+  display: flex;
 }
 
 .status-toggle {
@@ -226,13 +229,16 @@ body {
 /* Legend */
 
 .legend {
-  display: flex;
   gap: 1rem;
   list-style: none;
   padding: 0;
   margin: 0 0 1rem;
   font-size: 0.8rem;
   color: var(--color-muted);
+}
+
+.legend:not([hidden]) {
+  display: flex;
 }
 
 .legend-item {
@@ -333,9 +339,12 @@ body {
   list-style: none;
   padding: 0;
   margin: 0;
-  display: flex;
   flex-direction: column;
   gap: 0.5rem;
+}
+
+.task-list:not([hidden]) {
+  display: flex;
 }
 
 .task {
