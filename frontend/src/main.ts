@@ -6,6 +6,7 @@ const THEME_STORAGE_KEY = "theme";
 type Theme = "light" | "dark";
 
 const MIN_PASSWORD_LENGTH = 8;
+const SEARCH_DEBOUNCE_MS = 250;
 
 const EYE_ICON_PATHS = '<circle cx="12" cy="12" r="2"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>';
 const EYE_OFF_ICON_PATHS =
@@ -482,9 +483,14 @@ async function init(): Promise<void> {
     });
   });
 
+  let searchDebounceTimer: ReturnType<typeof setTimeout> | undefined;
+
   searchInput.addEventListener("input", () => {
     searchQuery = searchInput.value;
-    void fetchTasks();
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+      void fetchTasks();
+    }, SEARCH_DEBOUNCE_MS);
   });
 
   retryBtn.addEventListener("click", () => {
