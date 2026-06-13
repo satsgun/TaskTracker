@@ -488,12 +488,15 @@ async function init(): Promise<void> {
     }
   });
 
-  const user = await getCurrentUser();
-  if (user) {
+  const currentUser = await getCurrentUser();
+  if (currentUser.status === "ok") {
     showTaskView();
     void fetchTasks();
-  } else {
+  } else if (currentUser.status === "unauthenticated") {
     showAuthView();
+  } else {
+    showTaskView();
+    showErrorState();
   }
 }
 

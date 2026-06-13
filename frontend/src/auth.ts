@@ -11,17 +11,26 @@ export interface CurrentUser {
   created_at: string;
 }
 
-export async function getCurrentUser(): Promise<CurrentUser | null> {
+export type CurrentUserResult =
+  | { status: "ok"; user: CurrentUser }
+  | { status: "unauthenticated" }
+  | { status: "error" };
+
+export async function getCurrentUser(): Promise<CurrentUserResult> {
   try {
     const response = await fetch("/auth/me", { credentials: "same-origin" });
 
-    if (!response.ok) {
-      return null;
+    if (response.status === 401) {
+      return { status: "unauthenticated" };
     }
 
-    return await response.json();
+    if (!response.ok) {
+      return { status: "error" };
+    }
+
+    return { status: "ok", user: await response.json() };
   } catch {
-    return null;
+    return { status: "error" };
   }
 }
 

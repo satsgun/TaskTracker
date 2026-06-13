@@ -217,6 +217,22 @@ describe("View routing based on session", () => {
     expect(document.querySelector<HTMLElement>("#task-view")!.hidden).toBe(true);
   });
 
+  it("shows the error state (not the auth view) when /auth/me returns 500", async () => {
+    vi.stubGlobal(
+      "fetch",
+      mockFetch({
+        "/auth/me": { status: 500, body: { detail: "Internal Server Error" } },
+        "/tasks/list": { status: 200, body: [] },
+      }),
+    );
+    await loadApp();
+    await flushAsync();
+
+    expect(document.querySelector<HTMLElement>("#auth-view")!.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>("#task-view")!.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>("#error-state")!.hidden).toBe(false);
+  });
+
   it("returns to the auth view when a task request returns 401", async () => {
     vi.stubGlobal(
       "fetch",
