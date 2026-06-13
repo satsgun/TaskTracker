@@ -29,8 +29,10 @@ def create_session(db: Session, user_id: int) -> AuthSession:
     return session
 
 
-def get_session(db: Session, session_id: str) -> AuthSession | None:
-    return db.get(AuthSession, session_id)
+def get_session_with_user(db: Session, session_id: str) -> tuple[AuthSession, User] | None:
+    return db.execute(
+        select(AuthSession, User).join(User, AuthSession.user_id == User.id).where(AuthSession.id == session_id)
+    ).first()
 
 
 def touch_session(db: Session, session: AuthSession) -> None:

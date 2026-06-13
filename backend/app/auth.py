@@ -18,17 +18,15 @@ def get_current_user(
     if session_id is None:
         raise not_authenticated
 
-    session = crud.get_session(db, session_id)
-    if session is None:
+    result = crud.get_session_with_user(db, session_id)
+    if result is None:
         raise not_authenticated
+
+    session, user = result
 
     if datetime.utcnow() - session.last_seen_at >= IDLE_TIMEOUT:
         crud.delete_session(db, session_id)
         raise not_authenticated
 
     crud.touch_session(db, session)
-    user = db.get(User, session.user_id)
-    if user is None:
-        raise not_authenticated
-
     return user
