@@ -48,7 +48,7 @@ function initTheme(): void {
   });
 }
 
-function initSignupForm(): void {
+function initSignupForm(onSuccess: () => void): void {
   const signupForm = document.querySelector<HTMLFormElement>("#signup-form");
   const firstNameInput = document.querySelector<HTMLInputElement>('#signup-form input[name="first_name"]');
   const lastNameInput = document.querySelector<HTMLInputElement>('#signup-form input[name="last_name"]');
@@ -77,6 +77,15 @@ function initSignupForm(): void {
     }
 
     errorEl.hidden = true;
+
+    const loginResult = await login(emailInput.value, passwordInput.value);
+    if (!loginResult.ok) {
+      errorEl.textContent = loginResult.error ?? "Something went wrong. Please try again.";
+      errorEl.hidden = false;
+      return;
+    }
+
+    onSuccess();
   });
 }
 
@@ -178,7 +187,6 @@ function initSignupPasswordConfirmation(): void {
 
 async function init(): Promise<void> {
   initTheme();
-  initSignupForm();
   initAuthToggle();
   initPasswordToggles();
   initSignupPasswordConfirmation();
@@ -207,6 +215,11 @@ async function init(): Promise<void> {
   }
 
   initLoginForm(() => {
+    showTaskView();
+    void fetchTasks();
+  });
+
+  initSignupForm(() => {
     showTaskView();
     void fetchTasks();
   });
