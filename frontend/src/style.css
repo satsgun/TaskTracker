@@ -97,7 +97,7 @@ body {
   width: 52px;
   height: 52px;
   border-radius: 8px;
-  background: var(--color-accent);
+  background: #007fff;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -132,6 +132,10 @@ body {
 
 .auth-form .btn {
   align-self: stretch;
+}
+
+.auth-form .btn-primary {
+  background: #007fff;
 }
 
 .auth-form .form-row {
