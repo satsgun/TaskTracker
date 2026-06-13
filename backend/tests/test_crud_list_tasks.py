@@ -31,7 +31,7 @@ class TestListTasks:
 
         user = _create_user(db)
 
-        assert list_tasks(db) == []
+        assert list_tasks(db, user_id=user.id) == []
 
     def test_list_tasks_includes_created_tasks(self):
         from app.crud import create_task, list_tasks
@@ -41,7 +41,7 @@ class TestListTasks:
         user = _create_user(db)
         created = create_task(db, description="Buy milk", user_id=user.id)
 
-        tasks = list_tasks(db)
+        tasks = list_tasks(db, user_id=user.id)
 
         assert [t.id for t in tasks] == [created.id]
 
@@ -54,7 +54,7 @@ class TestListTasks:
         incomplete = create_task(db, description="Write report", user_id=user.id)
         complete = _complete(db, create_task(db, description="Pay bills", user_id=user.id))
 
-        ids = [t.id for t in list_tasks(db)]
+        ids = [t.id for t in list_tasks(db, user_id=user.id)]
 
         assert incomplete.id in ids
         assert complete.id in ids
@@ -68,7 +68,7 @@ class TestListTasks:
         incomplete = create_task(db, description="Water plants", user_id=user.id)
         complete = _complete(db, create_task(db, description="Renew passport", user_id=user.id))
 
-        ids = [t.id for t in list_tasks(db, status="pending")]
+        ids = [t.id for t in list_tasks(db, status="pending", user_id=user.id)]
 
         assert incomplete.id in ids
         assert complete.id not in ids
@@ -81,7 +81,7 @@ class TestListTasks:
         user = _create_user(db)
         complete = _complete(db, create_task(db, description="File taxes", user_id=user.id))
 
-        ids = [t.id for t in list_tasks(db, status="all")]
+        ids = [t.id for t in list_tasks(db, status="all", user_id=user.id)]
 
         assert complete.id in ids
 
@@ -94,7 +94,7 @@ class TestListTasks:
         match = create_task(db, description="Buy groceries", user_id=user.id)
         other = create_task(db, description="Schedule dentist", user_id=user.id)
 
-        ids = [t.id for t in list_tasks(db, q="GROCER")]
+        ids = [t.id for t in list_tasks(db, q="GROCER", user_id=user.id)]
 
         assert match.id in ids
         assert other.id not in ids
@@ -107,7 +107,7 @@ class TestListTasks:
         user = _create_user(db)
         create_task(db, description="Buy groceries", user_id=user.id)
 
-        assert list_tasks(db, q="no-such-task-zzz") == []
+        assert list_tasks(db, q="no-such-task-zzz", user_id=user.id) == []
 
     def test_search_treats_percent_and_underscore_as_literal_characters(self):
         from app.crud import create_task, list_tasks
@@ -118,7 +118,7 @@ class TestListTasks:
         match = create_task(db, description="50%_off everything", user_id=user.id)
         other = create_task(db, description="50X off everything", user_id=user.id)
 
-        ids = [t.id for t in list_tasks(db, q="50%_off")]
+        ids = [t.id for t in list_tasks(db, q="50%_off", user_id=user.id)]
 
         assert match.id in ids
         assert other.id not in ids
@@ -132,7 +132,7 @@ class TestListTasks:
         incomplete_match = create_task(db, description="Buy stamps", user_id=user.id)
         complete_match = _complete(db, create_task(db, description="Buy a gift", user_id=user.id))
 
-        ids = [t.id for t in list_tasks(db, status="pending", q="buy")]
+        ids = [t.id for t in list_tasks(db, status="pending", q="buy", user_id=user.id)]
 
         assert incomplete_match.id in ids
         assert complete_match.id not in ids
@@ -147,6 +147,6 @@ class TestListTasks:
         high = create_task(db, description="High task", priority="High", user_id=user.id)
         medium = create_task(db, description="Medium task", priority="Medium", user_id=user.id)
 
-        ids = [t.id for t in list_tasks(db)]
+        ids = [t.id for t in list_tasks(db, user_id=user.id)]
 
         assert ids.index(high.id) < ids.index(medium.id) < ids.index(low.id)

@@ -37,7 +37,7 @@ class TestDeleteTask:
 
         delete_task(db, task.id)
 
-        ids = [t.id for t in list_tasks(db)]
+        ids = [t.id for t in list_tasks(db, user_id=user.id)]
         assert task.id not in ids
 
     def test_delete_nonexistent_task_returns_false(self):
@@ -71,6 +71,6 @@ class TestDeleteTask:
 
         delete_task(db, remove.id)
 
-        ids = [t.id for t in list_tasks(db)]
+        ids = [t.id for t in list_tasks(db, user_id=user.id)]
         assert keep.id in ids
         assert remove.id not in ids

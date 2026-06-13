@@ -76,7 +76,7 @@ def list_tasks(
     db: Session = Depends(get_db),
     user: User = Depends(get_current_user),
 ) -> list[TaskOut]:
-    return crud.list_tasks(db, status=task_status, q=q)
+    return crud.list_tasks(db, status=task_status, q=q, user_id=user.id)
 
 
 @app.patch("/tasks/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)

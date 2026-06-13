@@ -67,7 +67,7 @@ class TestUpdateTaskDescription:
 
         update_task(db, task.id, description="Write quarterly report")
 
-        listed = list_tasks(db)
+        listed = list_tasks(db, user_id=user.id)
         stored = next(t for t in listed if t.id == task.id)
         assert stored.description == "Write quarterly report"
 

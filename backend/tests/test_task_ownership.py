@@ -67,3 +67,22 @@ class TestTaskAttribution:
 
         task = db_session.execute(select(Task)).scalars().one()
         assert task.user_id is not None
+
+
+class TestListTasksIsolation:
+    def test_list_tasks_only_returns_own_tasks(self, auth_client, second_auth_client):
+        auth_client.post("/tasks/", json={"description": "User A task 1"})
+        auth_client.post("/tasks/", json={"description": "User A task 2"})
+        second_auth_client.post("/tasks/", json={"description": "User B task 1"})
+
+        response = auth_client.get("/tasks/list")
+
+        assert response.status_code == 200
+        descriptions = {task["description"] for task in response.json()}
+        assert descriptions == {"User A task 1", "User A task 2"}
+
+    def test_list_tasks_for_user_with_no_tasks_returns_empty_list(self, second_auth_client):
+        response = second_auth_client.get("/tasks/list")
+
+        assert response.status_code == 200
+        assert response.json() == []

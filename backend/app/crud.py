@@ -112,8 +112,8 @@ def apply_update(
     return task
 
 
-def list_tasks(db: Session, status: str = "all", q: str | None = None) -> list[Task]:
-    stmt = select(Task)
+def list_tasks(db: Session, status: str = "all", q: str | None = None, *, user_id: int) -> list[Task]:
+    stmt = select(Task).where(Task.user_id == user_id)
 
     if status == "pending":
         stmt = stmt.where(Task.status == "Incomplete")

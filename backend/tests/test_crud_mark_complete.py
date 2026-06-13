@@ -64,7 +64,7 @@ class TestSetStatus:
 
         set_status(db, task.id, "Complete")
 
-        listed = list_tasks(db)
+        listed = list_tasks(db, user_id=user.id)
         stored = next(t for t in listed if t.id == task.id)
         assert stored.status == "Complete"
 
