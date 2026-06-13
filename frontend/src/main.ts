@@ -5,6 +5,8 @@ import type { Priority, StatusFilter, Task } from "./types";
 const THEME_STORAGE_KEY = "theme";
 type Theme = "light" | "dark";
 
+const MIN_PASSWORD_LENGTH = 8;
+
 const EYE_ICON_PATHS = '<circle cx="12" cy="12" r="2"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>';
 const EYE_OFF_ICON_PATHS =
   '<path d="M3 3l18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-2.2 3.1"/>' +
@@ -159,9 +161,14 @@ function initSignupPasswordConfirmation(): void {
   }
 
   function validate(): void {
-    const matches = passwordInput!.value !== "" && passwordInput!.value === confirmInput!.value;
-    errorEl!.hidden = confirmInput!.value === "" || matches;
-    submitBtn!.disabled = !matches;
+    const password = passwordInput!.value;
+    const confirm = confirmInput!.value;
+    const matches = password !== "" && password === confirm;
+    const mismatched = confirm !== "" && !matches;
+
+    errorEl!.hidden = !mismatched;
+    confirmInput!.classList.toggle("mismatch", mismatched);
+    submitBtn!.disabled = !(matches && password.length >= MIN_PASSWORD_LENGTH);
   }
 
   passwordInput.addEventListener("input", validate);

@@ -134,12 +134,22 @@ body {
   align-self: stretch;
 }
 
+.auth-form .form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
 .auth-form .pw-wrap {
   position: relative;
 }
 
 .auth-form .pw-wrap input {
   padding-right: 2.5rem;
+}
+
+.auth-form input.mismatch {
+  border-color: var(--color-overdue);
 }
 
 .pw-toggle {
