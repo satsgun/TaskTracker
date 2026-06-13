@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import { formatDueLabel, renderCounter, renderTaskList } from "../src/render";
-import { createMockTasks, offsetDate } from "../src/tasks";
+import { offsetDate } from "../src/tasks";
 import type { Task } from "../src/types";
 
 const today = new Date("2026-06-11T00:00:00Z");
@@ -17,11 +17,58 @@ function makeTask(overrides: Partial<Task>): Task {
   };
 }
 
+function createTasks(today: Date): Task[] {
+  return [
+    makeTask({
+      id: 1,
+      description: "Pay electricity bill",
+      priority: "High",
+      due_date: offsetDate(-10, today),
+      status: "Incomplete",
+    }),
+    makeTask({
+      id: 2,
+      description: "Write quarterly report",
+      priority: "High",
+      due_date: null,
+      status: "Incomplete",
+    }),
+    makeTask({
+      id: 3,
+      description: "Send invoice",
+      priority: "Medium",
+      due_date: offsetDate(-6, today),
+      status: "Complete",
+    }),
+    makeTask({
+      id: 4,
+      description: "Clean garage",
+      priority: "Medium",
+      due_date: offsetDate(3, today),
+      status: "Complete",
+    }),
+    makeTask({
+      id: 5,
+      description: "Buy groceries",
+      priority: "Low",
+      due_date: offsetDate(9, today),
+      status: "Incomplete",
+    }),
+    makeTask({
+      id: 6,
+      description: "Schedule dentist appointment",
+      priority: "Low",
+      due_date: offsetDate(-8, today),
+      status: "Incomplete",
+    }),
+  ];
+}
+
 describe("renderCounter", () => {
   it("shows the total task count and pending count", () => {
     const el = document.createElement("p");
 
-    renderCounter(el, createMockTasks(today));
+    renderCounter(el, createTasks(today));
 
     expect(el.textContent).toBe("6 tasks · 4 pending");
   });
@@ -39,7 +86,7 @@ describe("renderTaskList", () => {
   it("renders one row per task, sorted by priority", () => {
     const container = document.createElement("ul");
 
-    renderTaskList(container, createMockTasks(today), today);
+    renderTaskList(container, createTasks(today), today);
 
     const rows = container.querySelectorAll(".task");
     expect(rows).toHaveLength(6);
@@ -51,7 +98,7 @@ describe("renderTaskList", () => {
   it("applies the correct color-state class per row", () => {
     const container = document.createElement("ul");
 
-    renderTaskList(container, createMockTasks(today), today);
+    renderTaskList(container, createTasks(today), today);
 
     const rows = container.querySelectorAll(".task");
     // "Pay electricity bill": High priority, overdue, incomplete
@@ -63,7 +110,7 @@ describe("renderTaskList", () => {
   it("renders a priority badge and action buttons for each row", () => {
     const container = document.createElement("ul");
 
-    renderTaskList(container, createMockTasks(today), today);
+    renderTaskList(container, createTasks(today), today);
 
     container.querySelectorAll(".task").forEach((row) => {
       expect(row.querySelector(".priority-badge")).not.toBeNull();
@@ -75,7 +122,7 @@ describe("renderTaskList", () => {
 
   it("renders Save/Cancel inputs for the row matching editingId", () => {
     const container = document.createElement("ul");
-    const tasks = createMockTasks(today);
+    const tasks = createTasks(today);
 
     renderTaskList(container, tasks, today, tasks[0].id);
 
