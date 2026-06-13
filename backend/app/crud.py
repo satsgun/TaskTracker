@@ -66,17 +66,6 @@ def _get_owned_task(db: Session, task_id: int, user_id: int) -> Task | None:
     return db.execute(select(Task).where(Task.id == task_id, Task.user_id == user_id)).scalar_one_or_none()
 
 
-def set_status(db: Session, task_id: int, status: str) -> Task | None:
-    task = db.get(Task, task_id)
-    if task is None:
-        return None
-
-    task.status = status
-    db.commit()
-    db.refresh(task)
-    return task
-
-
 def delete_task(db: Session, task_id: int, user_id: int) -> bool:
     task = _get_owned_task(db, task_id, user_id)
     if task is None:
@@ -85,17 +74,6 @@ def delete_task(db: Session, task_id: int, user_id: int) -> bool:
     db.delete(task)
     db.commit()
     return True
-
-
-def update_task(db: Session, task_id: int, description: str) -> Task | None:
-    task = db.get(Task, task_id)
-    if task is None:
-        return None
-
-    task.description = description
-    db.commit()
-    db.refresh(task)
-    return task
 
 
 def apply_update(
