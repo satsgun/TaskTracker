@@ -5,6 +5,11 @@ import type { Priority, StatusFilter, Task } from "./types";
 const THEME_STORAGE_KEY = "theme";
 type Theme = "light" | "dark";
 
+const EYE_ICON_PATHS = '<circle cx="12" cy="12" r="2"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>';
+const EYE_OFF_ICON_PATHS =
+  '<path d="M3 3l18 18"/><path d="M10.6 5.1A10.9 10.9 0 0 1 12 5c6.5 0 10 7 10 7a18 18 0 0 1-2.2 3.1"/>' +
+  '<path d="M6.6 6.6A18 18 0 0 0 2 12s3.5 7 10 7a10.8 10.8 0 0 0 4.4-.9"/><path d="M9.9 9.9a3 3 0 0 0 4.2 4.2"/>';
+
 function getPreferredTheme(): Theme {
   const stored = localStorage.getItem(THEME_STORAGE_KEY);
   if (stored === "light" || stored === "dark") {
@@ -104,6 +109,7 @@ function initAuthToggle(): void {
   const loginForm = document.querySelector<HTMLElement>("#login-form");
   const showLoginBtn = document.querySelector<HTMLButtonElement>("#show-login");
   const showSignupBtn = document.querySelector<HTMLButtonElement>("#show-signup");
+  const subtitle = document.querySelector<HTMLElement>("#auth-subtitle");
 
   if (!signupForm || !loginForm || !showLoginBtn || !showSignupBtn) {
     return;
@@ -112,18 +118,63 @@ function initAuthToggle(): void {
   showLoginBtn.addEventListener("click", () => {
     signupForm.hidden = true;
     loginForm.hidden = false;
+    if (subtitle) subtitle.textContent = "Sign in to your account";
   });
 
   showSignupBtn.addEventListener("click", () => {
     loginForm.hidden = true;
     signupForm.hidden = false;
+    if (subtitle) subtitle.textContent = "Create your account";
   });
+}
+
+function initPasswordToggles(): void {
+  document.querySelectorAll<HTMLButtonElement>(".pw-toggle").forEach((toggle) => {
+    const input = document.getElementById(toggle.dataset.target ?? "") as HTMLInputElement | null;
+    const icon = toggle.querySelector("svg");
+
+    if (!input || !icon) {
+      return;
+    }
+
+    toggle.addEventListener("click", () => {
+      const showing = input.type === "text";
+      input.type = showing ? "password" : "text";
+      icon.classList.toggle("ti-eye", showing);
+      icon.classList.toggle("ti-eye-off", !showing);
+      icon.innerHTML = showing ? EYE_ICON_PATHS : EYE_OFF_ICON_PATHS;
+      toggle.setAttribute("aria-label", showing ? "Show password" : "Hide password");
+    });
+  });
+}
+
+function initSignupPasswordConfirmation(): void {
+  const passwordInput = document.querySelector<HTMLInputElement>('#signup-form input[name="password"]');
+  const confirmInput = document.querySelector<HTMLInputElement>('#signup-form input[name="confirm_password"]');
+  const errorEl = document.querySelector<HTMLElement>("#signup-confirm-password-error");
+  const submitBtn = document.querySelector<HTMLButtonElement>('#signup-form button[type="submit"]');
+
+  if (!passwordInput || !confirmInput || !errorEl || !submitBtn) {
+    return;
+  }
+
+  function validate(): void {
+    const matches = passwordInput!.value !== "" && passwordInput!.value === confirmInput!.value;
+    errorEl!.hidden = confirmInput!.value === "" || matches;
+    submitBtn!.disabled = !matches;
+  }
+
+  passwordInput.addEventListener("input", validate);
+  confirmInput.addEventListener("input", validate);
+  validate();
 }
 
 async function init(): Promise<void> {
   initTheme();
   initSignupForm();
   initAuthToggle();
+  initPasswordToggles();
+  initSignupPasswordConfirmation();
 
   const authView = document.querySelector<HTMLElement>("#auth-view");
   const taskView = document.querySelector<HTMLElement>("#task-view");

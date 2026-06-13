@@ -9,43 +9,80 @@
   <body>
     <div id="app">
       <section id="auth-view" class="auth-view" hidden>
-        <form id="signup-form" class="auth-form" novalidate>
-          <h2>Sign up</h2>
-          <div class="form-field">
-            <label for="signup-first-name">First name</label>
-            <input type="text" id="signup-first-name" name="first_name" required />
+        <div class="auth-card">
+          <div class="auth-brand">
+            <div class="auth-logo" aria-hidden="true">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3.5 5.5l1.5 1.5l2.5-2.5"/><path d="M3.5 11.5l1.5 1.5l2.5-2.5"/><path d="M3.5 17.5l1.5 1.5l2.5-2.5"/>
+                <line x1="11" y1="6" x2="20" y2="6"/><line x1="11" y1="12" x2="20" y2="12"/><line x1="11" y1="18" x2="20" y2="18"/>
+              </svg>
+            </div>
+            <h1>Task Tracker</h1>
+            <p id="auth-subtitle">Sign in to your account</p>
           </div>
-          <div class="form-field">
-            <label for="signup-last-name">Last name</label>
-            <input type="text" id="signup-last-name" name="last_name" required />
-          </div>
-          <div class="form-field">
-            <label for="signup-email">Email</label>
-            <input type="email" id="signup-email" name="email" required />
-          </div>
-          <div class="form-field">
-            <label for="signup-password">Password</label>
-            <input type="password" id="signup-password" name="password" required />
-          </div>
-          <p class="field-error" id="signup-error" role="alert" hidden></p>
-          <button type="submit" class="btn btn-primary">Sign up</button>
-          <button type="button" id="show-login" class="btn btn-secondary">Have an account? Log in</button>
-        </form>
 
-        <form id="login-form" class="auth-form" novalidate hidden>
-          <h2>Log in</h2>
-          <div class="form-field">
-            <label for="login-email">Email</label>
-            <input type="email" id="login-email" name="email" required />
-          </div>
-          <div class="form-field">
-            <label for="login-password">Password</label>
-            <input type="password" id="login-password" name="password" required />
-          </div>
-          <p class="field-error" id="login-error" role="alert" hidden></p>
-          <button type="submit" class="btn btn-primary">Log in</button>
-          <button type="button" id="show-signup" class="btn btn-secondary">Need an account? Sign up</button>
-        </form>
+          <form id="login-form" class="auth-form" novalidate>
+            <div class="form-field">
+              <label for="login-email">Email</label>
+              <input type="email" id="login-email" name="email" required />
+            </div>
+            <div class="form-field">
+              <label for="login-password">Password</label>
+              <div class="pw-wrap">
+                <input type="password" id="login-password" name="password" required />
+                <button type="button" class="pw-toggle" data-target="login-password" aria-label="Show password">
+                  <svg class="ti-eye" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="2"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <p class="field-error" id="login-error" role="alert" hidden></p>
+            <button type="submit" class="btn btn-primary">Sign in</button>
+            <p class="auth-alt">New here? <button type="button" id="show-signup" class="link-btn">Create an account</button></p>
+          </form>
+
+          <form id="signup-form" class="auth-form" novalidate hidden>
+            <div class="form-field">
+              <label for="signup-first-name">First name</label>
+              <input type="text" id="signup-first-name" name="first_name" required />
+            </div>
+            <div class="form-field">
+              <label for="signup-last-name">Last name</label>
+              <input type="text" id="signup-last-name" name="last_name" required />
+            </div>
+            <div class="form-field">
+              <label for="signup-email">Email</label>
+              <input type="email" id="signup-email" name="email" required />
+            </div>
+            <div class="form-field">
+              <label for="signup-password">Password</label>
+              <div class="pw-wrap">
+                <input type="password" id="signup-password" name="password" required />
+                <button type="button" class="pw-toggle" data-target="signup-password" aria-label="Show password">
+                  <svg class="ti-eye" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="2"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div class="form-field">
+              <label for="signup-confirm-password">Confirm password</label>
+              <div class="pw-wrap">
+                <input type="password" id="signup-confirm-password" name="confirm_password" required />
+                <button type="button" class="pw-toggle" data-target="signup-confirm-password" aria-label="Show password">
+                  <svg class="ti-eye" viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="2"/><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7-10-7-10-7z"/>
+                  </svg>
+                </button>
+              </div>
+              <p class="field-error" id="signup-confirm-password-error" role="alert" hidden>Passwords don't match</p>
+            </div>
+            <p class="field-error" id="signup-error" role="alert" hidden></p>
+            <button type="submit" class="btn btn-primary" disabled>Sign up</button>
+            <p class="auth-alt">Already have an account? <button type="button" id="show-login" class="link-btn">Log in</button></p>
+          </form>
+        </div>
       </section>
 
       <div id="task-view" hidden>

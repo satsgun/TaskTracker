@@ -62,6 +62,7 @@ describe("Signup form", () => {
     document.querySelector<HTMLInputElement>('#signup-form input[name="last_name"]')!.value = "Lovelace";
     document.querySelector<HTMLInputElement>('#signup-form input[name="email"]')!.value = "ada@example.com";
     document.querySelector<HTMLInputElement>('#signup-form input[name="password"]')!.value = "super-secret";
+    document.querySelector<HTMLInputElement>('#signup-form input[name="confirm_password"]')!.value = "super-secret";
     document.querySelector<HTMLFormElement>("#signup-form")!.requestSubmit();
     await flushAsync();
 
@@ -92,6 +93,7 @@ describe("Signup form", () => {
     document.querySelector<HTMLInputElement>('#signup-form input[name="last_name"]')!.value = "Lovelace";
     document.querySelector<HTMLInputElement>('#signup-form input[name="email"]')!.value = "ada@example.com";
     document.querySelector<HTMLInputElement>('#signup-form input[name="password"]')!.value = "super-secret";
+    document.querySelector<HTMLInputElement>('#signup-form input[name="confirm_password"]')!.value = "super-secret";
     document.querySelector<HTMLFormElement>("#signup-form")!.requestSubmit();
     await flushAsync();
 
@@ -179,19 +181,97 @@ describe("Auth form toggle", () => {
     localStorage.clear();
   });
 
-  it("switches from signup to login when 'Have an account? Log in' is clicked", () => {
-    document.querySelector<HTMLButtonElement>("#show-login")!.click();
-
-    expect(document.querySelector<HTMLElement>("#signup-form")!.hidden).toBe(true);
-    expect(document.querySelector<HTMLElement>("#login-form")!.hidden).toBe(false);
-  });
-
-  it("switches from login to signup when 'Need an account? Sign up' is clicked", () => {
-    document.querySelector<HTMLButtonElement>("#show-login")!.click();
+  it("switches from login to signup when 'Create an account' is clicked", () => {
     document.querySelector<HTMLButtonElement>("#show-signup")!.click();
 
-    expect(document.querySelector<HTMLElement>("#signup-form")!.hidden).toBe(false);
     expect(document.querySelector<HTMLElement>("#login-form")!.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>("#signup-form")!.hidden).toBe(false);
+  });
+
+  it("switches from signup back to login when 'Log in' is clicked", () => {
+    document.querySelector<HTMLButtonElement>("#show-signup")!.click();
+    document.querySelector<HTMLButtonElement>("#show-login")!.click();
+
+    expect(document.querySelector<HTMLElement>("#login-form")!.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>("#signup-form")!.hidden).toBe(true);
+  });
+});
+
+describe("Password visibility toggle", () => {
+  beforeEach(async () => {
+    vi.stubGlobal(
+      "fetch",
+      mockFetch({
+        "/tasks/list": { status: 200, body: [] },
+      }),
+    );
+    await loadApp();
+  });
+
+  afterEach(() => {
+    document.documentElement.innerHTML = "";
+    vi.unstubAllGlobals();
+    localStorage.clear();
+  });
+
+  it("toggles the login password field between hidden and visible text", () => {
+    const input = document.querySelector<HTMLInputElement>("#login-password")!;
+    const toggle = document.querySelector<HTMLButtonElement>('.pw-toggle[data-target="login-password"]')!;
+    const icon = toggle.querySelector("svg")!;
+
+    expect(input.type).toBe("password");
+
+    toggle.click();
+    expect(input.type).toBe("text");
+    expect(icon.classList.contains("ti-eye-off")).toBe(true);
+    expect(toggle.getAttribute("aria-label")).toBe("Hide password");
+
+    toggle.click();
+    expect(input.type).toBe("password");
+    expect(icon.classList.contains("ti-eye")).toBe(true);
+    expect(toggle.getAttribute("aria-label")).toBe("Show password");
+  });
+});
+
+describe("Signup password confirmation", () => {
+  beforeEach(async () => {
+    vi.stubGlobal(
+      "fetch",
+      mockFetch({
+        "/tasks/list": { status: 200, body: [] },
+      }),
+    );
+    await loadApp();
+    document.querySelector<HTMLButtonElement>("#show-signup")!.click();
+  });
+
+  afterEach(() => {
+    document.documentElement.innerHTML = "";
+    vi.unstubAllGlobals();
+    localStorage.clear();
+  });
+
+  it("shows a mismatch error and disables the submit button until the passwords match", () => {
+    const passwordInput = document.querySelector<HTMLInputElement>('#signup-form input[name="password"]')!;
+    const confirmInput = document.querySelector<HTMLInputElement>('#signup-form input[name="confirm_password"]')!;
+    const error = document.querySelector<HTMLElement>("#signup-confirm-password-error")!;
+    const submitBtn = document.querySelector<HTMLButtonElement>('#signup-form button[type="submit"]')!;
+
+    expect(submitBtn.disabled).toBe(true);
+
+    passwordInput.value = "super-secret";
+    passwordInput.dispatchEvent(new Event("input"));
+    confirmInput.value = "super-secre";
+    confirmInput.dispatchEvent(new Event("input"));
+
+    expect(error.hidden).toBe(false);
+    expect(submitBtn.disabled).toBe(true);
+
+    confirmInput.value = "super-secret";
+    confirmInput.dispatchEvent(new Event("input"));
+
+    expect(error.hidden).toBe(true);
+    expect(submitBtn.disabled).toBe(false);
   });
 });
 
