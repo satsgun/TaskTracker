@@ -1,3 +1,4 @@
+import logging
 import os
 from pathlib import Path
 from typing import Literal
@@ -14,7 +15,16 @@ from app.models import User
 from app.schemas import TaskCreate, TaskOut, TaskUpdate, UserCreate, UserLogin, UserOut
 from app.security import hash_password, verify_password
 
+logger = logging.getLogger(__name__)
+
 Base.metadata.create_all(bind=engine)
+
+if COOKIE_SECURE:
+    logger.warning(
+        "COOKIE_SECURE is enabled (the default). The session cookie will only be sent over HTTPS, "
+        "so login will appear to succeed but /auth/me and /tasks/* will return 401 if this app is "
+        "served over plain HTTP. Set COOKIE_SECURE=false for non-TLS deployments."
+    )
 
 app = FastAPI(title="Task Tracker")
 

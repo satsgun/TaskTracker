@@ -65,6 +65,12 @@ uvicorn app.main:app --reload
 The API is served at `http://localhost:8000`. SQLite data is stored in
 `backend/tasktracker.db` (configurable via the `DATABASE_URL` env var).
 
+The session cookie is set with `Secure` by default (`COOKIE_SECURE=true`),
+so it's only sent back over HTTPS. If you're running the app over plain HTTP
+(e.g. local development without TLS, or a non-TLS deployment), set
+`COOKIE_SECURE=false` — otherwise login will appear to succeed but
+`/auth/me` and `/tasks/*` will return 401.
+
 ### Frontend
 
 ```
