@@ -25,6 +25,14 @@ export async function getCurrentUser(): Promise<CurrentUser | null> {
   }
 }
 
+export async function logout(): Promise<void> {
+  try {
+    await fetch("/auth/logout", { method: "POST", credentials: "same-origin" });
+  } catch {
+    // ignore network errors; the client-side view is reset regardless
+  }
+}
+
 export async function login(email: string, password: string): Promise<AuthResult> {
   try {
     const response = await fetch("/auth/login", {

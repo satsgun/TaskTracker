@@ -224,3 +224,24 @@ class TestMe:
         response = idle_client.get("/auth/me")
 
         assert response.status_code == 401
+
+
+class TestLogout:
+    def test_logout_returns_204(self, auth_client):
+        response = auth_client.post("/auth/logout")
+
+        assert response.status_code == 204
+
+    def test_me_after_logout_returns_401(self, auth_client):
+        auth_client.post("/auth/logout")
+
+        response = auth_client.get("/auth/me")
+
+        assert response.status_code == 401
+
+    def test_list_tasks_after_logout_returns_401(self, auth_client):
+        auth_client.post("/auth/logout")
+
+        response = auth_client.get("/tasks/list")
+
+        assert response.status_code == 401

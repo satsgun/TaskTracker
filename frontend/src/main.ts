@@ -1,4 +1,4 @@
-import { getCurrentUser, login, signup } from "./auth";
+import { getCurrentUser, login, logout, signup } from "./auth";
 import { renderCounter, renderTaskList } from "./render";
 import type { Priority, StatusFilter, Task } from "./types";
 
@@ -161,6 +161,7 @@ async function init(): Promise<void> {
   const actionBannerEl = document.querySelector<HTMLElement>("#action-banner");
   const bannerMessageEl = document.querySelector<HTMLElement>("#action-banner .banner-message");
   const bannerDismissBtn = document.querySelector<HTMLButtonElement>("#action-banner .banner-dismiss");
+  const logoutBtn = document.querySelector<HTMLButtonElement>("#logout-btn");
 
   if (
     !form ||
@@ -179,7 +180,8 @@ async function init(): Promise<void> {
     !emptyStateEl ||
     !actionBannerEl ||
     !bannerMessageEl ||
-    !bannerDismissBtn
+    !bannerDismissBtn ||
+    !logoutBtn
   ) {
     return;
   }
@@ -337,6 +339,14 @@ async function init(): Promise<void> {
 
   bannerDismissBtn.addEventListener("click", () => {
     actionBannerEl!.hidden = true;
+  });
+
+  logoutBtn.addEventListener("click", () => {
+    void logout().then(() => {
+      tasks = [];
+      editingId = null;
+      showAuthView();
+    });
   });
 
   form.addEventListener("submit", async (event) => {

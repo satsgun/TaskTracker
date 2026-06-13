@@ -2,7 +2,7 @@ import os
 from pathlib import Path
 from typing import Literal
 
-from fastapi import Depends, FastAPI, HTTPException, Query, Response, status
+from fastapi import Cookie, Depends, FastAPI, HTTPException, Query, Response, status
 from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 
@@ -60,6 +60,18 @@ def login(credentials: UserLogin, response: Response, db: Session = Depends(get_
 @app.get("/auth/me", response_model=UserOut)
 def me(user: User = Depends(get_current_user)) -> UserOut:
     return user
+
+
+@app.post("/auth/logout", status_code=status.HTTP_204_NO_CONTENT)
+def logout(
+    response: Response,
+    session_id: str | None = Cookie(default=None, alias=SESSION_COOKIE_NAME),
+    db: Session = Depends(get_db),
+) -> None:
+    if session_id is not None:
+        crud.delete_session(db, session_id)
+
+    response.delete_cookie(key=SESSION_COOKIE_NAME, path="/")
 
 
 @app.post("/tasks/", response_model=TaskOut, status_code=status.HTTP_201_CREATED)

@@ -252,4 +252,25 @@ describe("View routing based on session", () => {
     expect(document.querySelector<HTMLElement>("#auth-view")!.hidden).toBe(true);
     expect(document.querySelector<HTMLElement>("#task-view")!.hidden).toBe(false);
   });
+
+  it("returns to the auth view and calls /auth/logout when the logout button is clicked", async () => {
+    const fetchMock = mockFetch({
+      "/auth/me": {
+        status: 200,
+        body: { id: 1, first_name: "Ada", last_name: "Lovelace", email: "ada@example.com", created_at: "2026-06-11T00:00:00Z" },
+      },
+      "/tasks/list": { status: 200, body: [] },
+      "/auth/logout": { status: 204, body: null },
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    await loadApp();
+    await flushAsync();
+
+    document.querySelector<HTMLButtonElement>("#logout-btn")!.click();
+    await flushAsync();
+
+    expect(fetchMock).toHaveBeenCalledWith("/auth/logout", expect.objectContaining({ method: "POST" }));
+    expect(document.querySelector<HTMLElement>("#auth-view")!.hidden).toBe(false);
+    expect(document.querySelector<HTMLElement>("#task-view")!.hidden).toBe(true);
+  });
 });
