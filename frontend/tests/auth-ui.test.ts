@@ -48,10 +48,14 @@ describe("Signup form", () => {
     localStorage.clear();
   });
 
-  it("submits first name, last name, email, and password to /auth/signup", async () => {
+  it("submits first name, last name, email, and password to /auth/signup, then logs in and shows the task view", async () => {
     const fetchMock = mockFetch({
       "/auth/signup": {
         status: 201,
+        body: { id: 1, first_name: "Ada", last_name: "Lovelace", email: "ada@example.com", created_at: "2026-06-11T00:00:00Z" },
+      },
+      "/auth/login": {
+        status: 200,
         body: { id: 1, first_name: "Ada", last_name: "Lovelace", email: "ada@example.com", created_at: "2026-06-11T00:00:00Z" },
       },
       "/tasks/list": { status: 200, body: [] },
@@ -78,6 +82,17 @@ describe("Signup form", () => {
         }),
       }),
     );
+
+    expect(fetchMock).toHaveBeenCalledWith(
+      "/auth/login",
+      expect.objectContaining({
+        method: "POST",
+        body: JSON.stringify({ email: "ada@example.com", password: "super-secret" }),
+      }),
+    );
+
+    expect(document.querySelector<HTMLElement>("#auth-view")!.hidden).toBe(true);
+    expect(document.querySelector<HTMLElement>("#task-view")!.hidden).toBe(false);
   });
 
   it("shows the API's error message when signup returns a duplicate-email error", async () => {
