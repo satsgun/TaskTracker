@@ -1,7 +1,7 @@
 from datetime import date, datetime
 from typing import Literal
 
-from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, EmailStr, field_validator, model_validator
 
 
 class TaskCreate(BaseModel):
@@ -49,7 +49,7 @@ class TaskOut(BaseModel):
 class UserCreate(BaseModel):
     first_name: str
     last_name: str
-    email: str
+    email: EmailStr
     password: str
 
     @field_validator("first_name", "last_name")
@@ -57,13 +57,6 @@ class UserCreate(BaseModel):
     def name_must_not_be_blank(cls, value: str) -> str:
         if not value.strip():
             raise ValueError("name must not be empty")
-        return value
-
-    @field_validator("email")
-    @classmethod
-    def email_must_be_valid(cls, value: str) -> str:
-        if "@" not in value or not value.strip():
-            raise ValueError("email must be valid")
         return value
 
     @field_validator("password")

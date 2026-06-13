@@ -9,6 +9,7 @@ dependencies = [
     "sqlalchemy",
     "passlib[bcrypt]",
     "bcrypt<4.1",
+    "pydantic[email]",
 ]
 
 [project.optional-dependencies]
