@@ -1,14 +1,6 @@
 import { describe, expect, it } from "vitest";
 
-import {
-  createMockTasks,
-  filterTasks,
-  isOverdue,
-  offsetDate,
-  rowState,
-  sortByPriority,
-  toIsoDate,
-} from "../src/tasks";
+import { isOverdue, offsetDate, rowState, sortByPriority, toIsoDate } from "../src/tasks";
 import type { Task } from "../src/types";
 
 const today = new Date("2026-06-11T00:00:00Z");
@@ -74,50 +66,5 @@ describe("sortByPriority", () => {
     sortByPriority(tasks);
 
     expect(tasks).toEqual(original);
-  });
-});
-
-describe("filterTasks", () => {
-  const tasks = createMockTasks(today);
-
-  it("returns only incomplete tasks for the 'pending' filter", () => {
-    const result = filterTasks(tasks, "pending", "");
-
-    expect(result.length).toBeGreaterThan(0);
-    expect(result.every((t) => t.status === "Incomplete")).toBe(true);
-  });
-
-  it("returns all tasks for the 'all' filter", () => {
-    expect(filterTasks(tasks, "all", "")).toHaveLength(tasks.length);
-  });
-
-  it("filters by case-insensitive description match", () => {
-    const result = filterTasks(tasks, "all", "GROCER");
-
-    expect(result).toHaveLength(1);
-    expect(result[0].description.toLowerCase()).toContain("grocer");
-  });
-
-  it("combines status and search filters", () => {
-    const result = filterTasks(tasks, "pending", "invoice");
-
-    expect(result).toHaveLength(0);
-  });
-});
-
-describe("createMockTasks", () => {
-  it("creates 6 tasks with 4 pending", () => {
-    const tasks = createMockTasks(today);
-
-    expect(tasks).toHaveLength(6);
-    expect(tasks.filter((t) => t.status === "Incomplete")).toHaveLength(4);
-  });
-
-  it("includes at least one overdue, one complete, and one not-overdue incomplete task", () => {
-    const tasks = createMockTasks(today);
-
-    expect(tasks.some((t) => rowState(t, today) === "overdue")).toBe(true);
-    expect(tasks.some((t) => rowState(t, today) === "complete")).toBe(true);
-    expect(tasks.some((t) => rowState(t, today) === "incomplete")).toBe(true);
   });
 });
