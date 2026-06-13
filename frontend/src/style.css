@@ -264,6 +264,10 @@ body {
   min-width: 0;
 }
 
+.auth-form .form-field {
+  flex: none;
+}
+
 .form-field--priority {
   flex: 0 1 130px;
 }
