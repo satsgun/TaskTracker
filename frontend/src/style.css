@@ -219,6 +219,29 @@ body {
   margin: 0;
 }
 
+.app-brand {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+}
+
+.app-logo {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: #007fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+}
+
+.app-logo svg {
+  width: 20px;
+  height: 20px;
+  stroke: #fff;
+}
+
 .header-controls {
   display: flex;
   align-items: center;
