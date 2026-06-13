@@ -123,7 +123,7 @@ describe("List tasks (API-backed)", () => {
     const search = document.querySelector<HTMLInputElement>('input[name="q"]')!;
     search.value = "groceries zzz";
     search.dispatchEvent(new Event("input", { bubbles: true }));
-    await flushAsync();
+    await new Promise((resolve) => setTimeout(resolve, 300));
 
     const url = lastFetchUrl(fetchMock);
     expect(url.pathname).toBe("/tasks/list");
