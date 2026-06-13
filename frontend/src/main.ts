@@ -138,6 +138,16 @@ async function init(): Promise<void> {
     if (taskView) taskView.hidden = false;
   }
 
+  async function fetchAuthed(url: string, init?: RequestInit): Promise<Response | null> {
+    const response = await fetch(url, { ...init, credentials: "same-origin" });
+    if (response.status === 401) {
+      showAuthView();
+      return null;
+    }
+
+    return response;
+  }
+
   initLoginForm(() => {
     showTaskView();
     void fetchTasks();
@@ -280,9 +290,8 @@ async function init(): Promise<void> {
     }
 
     try {
-      const response = await fetch(`/tasks/list?${params.toString()}`, { credentials: "same-origin" });
-      if (response.status === 401) {
-        showAuthView();
+      const response = await fetchAuthed(`/tasks/list?${params.toString()}`);
+      if (response === null) {
         return;
       }
 
@@ -320,9 +329,8 @@ async function init(): Promise<void> {
     onError: () => void,
   ): Promise<void> {
     try {
-      const response = await fetch(`/tasks/${id}/`, { ...init, credentials: "same-origin" });
-      if (response.status === 401) {
-        showAuthView();
+      const response = await fetchAuthed(`/tasks/${id}/`, init);
+      if (response === null) {
         return;
       }
 
@@ -359,9 +367,8 @@ async function init(): Promise<void> {
     }
 
     try {
-      const response = await fetch("/tasks/", {
+      const response = await fetchAuthed("/tasks/", {
         method: "POST",
-        credentials: "same-origin",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           description,
@@ -370,8 +377,7 @@ async function init(): Promise<void> {
         }),
       });
 
-      if (response.status === 401) {
-        showAuthView();
+      if (response === null) {
         return;
       }
 
