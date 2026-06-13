@@ -1,3 +1,6 @@
+from tests.conftest import create_test_user as _create_user
+
+
 def _make_session():
     from sqlalchemy import create_engine
     from sqlalchemy.orm import sessionmaker
@@ -8,12 +11,6 @@ def _make_session():
     Base.metadata.create_all(bind=engine)
     SessionLocal = sessionmaker(bind=engine)
     return SessionLocal()
-
-
-def _create_user(db):
-    from app.crud import create_user
-
-    return create_user(db, first_name="Test", last_name="User", email="user@example.com", hashed_password="hashed")
 
 
 class TestSetStatus:

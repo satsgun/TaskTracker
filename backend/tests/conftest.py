@@ -48,6 +48,12 @@ def db_session(db_session_factory):
         db.close()
 
 
+def create_test_user(db, *, email: str = "user@example.com"):
+    from app.crud import create_user
+
+    return create_user(db, first_name="Test", last_name="User", email=email, hashed_password="hashed")
+
+
 def _signup_and_login(email: str, password: str = "super-secret") -> TestClient:
     client = TestClient(app)
     client.post(
