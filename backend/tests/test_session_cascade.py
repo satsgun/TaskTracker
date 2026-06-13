@@ -25,3 +25,20 @@ class TestSessionCascadeDelete:
         db.commit()
 
         assert db.get(AuthSession, session_id) is None
+
+
+class TestTaskCascadeDelete:
+    def test_deleting_user_deletes_their_tasks(self):
+        from app import crud
+        from app.models import Task
+
+        db = _make_session()
+
+        user = crud.create_user(db, first_name="Ada", last_name="Lovelace", email="ada@example.com", hashed_password="hashed")
+        task = crud.create_task(db, description="Write tests", user_id=user.id)
+        task_id = task.id
+
+        db.delete(user)
+        db.commit()
+
+        assert db.get(Task, task_id) is None
