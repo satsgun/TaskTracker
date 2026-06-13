@@ -86,3 +86,27 @@ class TestListTasksIsolation:
 
         assert response.status_code == 200
         assert response.json() == []
+
+
+class TestCrossUserOwnership:
+    def test_update_other_users_task_returns_404(self, auth_client, second_auth_client):
+        created = auth_client.post("/tasks/", json={"description": "User A task"})
+        task_id = created.json()["id"]
+
+        response = second_auth_client.patch(f"/tasks/{task_id}/", json={"description": "Hijacked"})
+
+        assert response.status_code == 404
+
+        tasks = auth_client.get("/tasks/list").json()
+        assert tasks[0]["description"] == "User A task"
+
+    def test_delete_other_users_task_returns_404(self, auth_client, second_auth_client):
+        created = auth_client.post("/tasks/", json={"description": "User A task"})
+        task_id = created.json()["id"]
+
+        response = second_auth_client.delete(f"/tasks/{task_id}/")
+
+        assert response.status_code == 404
+
+        tasks = auth_client.get("/tasks/list").json()
+        assert any(task["id"] == task_id for task in tasks)

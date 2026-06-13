@@ -25,7 +25,7 @@ class TestDeleteTask:
         user = _create_user(db)
         task = create_task(db, description="Buy milk", user_id=user.id)
 
-        assert delete_task(db, task.id) is True
+        assert delete_task(db, task.id, user_id=user.id) is True
 
     def test_deleted_task_no_longer_in_list(self):
         from app.crud import create_task, delete_task, list_tasks
@@ -35,7 +35,7 @@ class TestDeleteTask:
         user = _create_user(db)
         task = create_task(db, description="Write report", user_id=user.id)
 
-        delete_task(db, task.id)
+        delete_task(db, task.id, user_id=user.id)
 
         ids = [t.id for t in list_tasks(db, user_id=user.id)]
         assert task.id not in ids
@@ -47,7 +47,7 @@ class TestDeleteTask:
 
         user = _create_user(db)
 
-        assert delete_task(db, 999999) is False
+        assert delete_task(db, 999999, user_id=user.id) is False
 
     def test_delete_already_deleted_task_returns_false(self):
         from app.crud import create_task, delete_task
@@ -56,9 +56,9 @@ class TestDeleteTask:
 
         user = _create_user(db)
         task = create_task(db, description="Pay bills", user_id=user.id)
-        delete_task(db, task.id)
+        delete_task(db, task.id, user_id=user.id)
 
-        assert delete_task(db, task.id) is False
+        assert delete_task(db, task.id, user_id=user.id) is False
 
     def test_deleting_one_task_does_not_affect_others(self):
         from app.crud import create_task, delete_task, list_tasks
@@ -69,7 +69,7 @@ class TestDeleteTask:
         keep = create_task(db, description="Renew passport", user_id=user.id)
         remove = create_task(db, description="Schedule dentist", user_id=user.id)
 
-        delete_task(db, remove.id)
+        delete_task(db, remove.id, user_id=user.id)
 
         ids = [t.id for t in list_tasks(db, user_id=user.id)]
         assert keep.id in ids

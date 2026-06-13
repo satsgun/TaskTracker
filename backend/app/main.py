@@ -83,14 +83,14 @@ def list_tasks(
 def update_task(
     task_id: int, task: TaskUpdate, db: Session = Depends(get_db), user: User = Depends(get_current_user)
 ) -> None:
-    updated = crud.apply_update(db, task_id, description=task.description, status=task.status)
+    updated = crud.apply_update(db, task_id, user_id=user.id, description=task.description, status=task.status)
     if updated is None:
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
 
 
 @app.delete("/tasks/{task_id}/", status_code=status.HTTP_204_NO_CONTENT)
 def delete_task(task_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)) -> None:
-    if not crud.delete_task(db, task_id):
+    if not crud.delete_task(db, task_id, user_id=user.id):
         raise HTTPException(status_code=404, detail=f"Task {task_id} not found")
 
 

@@ -73,8 +73,8 @@ def set_status(db: Session, task_id: int, status: str) -> Task | None:
     return task
 
 
-def delete_task(db: Session, task_id: int) -> bool:
-    task = db.get(Task, task_id)
+def delete_task(db: Session, task_id: int, user_id: int) -> bool:
+    task = db.execute(select(Task).where(Task.id == task_id, Task.user_id == user_id)).scalar_one_or_none()
     if task is None:
         return False
 
@@ -95,9 +95,9 @@ def update_task(db: Session, task_id: int, description: str) -> Task | None:
 
 
 def apply_update(
-    db: Session, task_id: int, description: str | None = None, status: str | None = None
+    db: Session, task_id: int, user_id: int, description: str | None = None, status: str | None = None
 ) -> Task | None:
-    task = db.get(Task, task_id)
+    task = db.execute(select(Task).where(Task.id == task_id, Task.user_id == user_id)).scalar_one_or_none()
     if task is None:
         return None
 
