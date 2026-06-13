@@ -265,12 +265,36 @@ describe("Signup password confirmation", () => {
     confirmInput.dispatchEvent(new Event("input"));
 
     expect(error.hidden).toBe(false);
+    expect(confirmInput.classList.contains("mismatch")).toBe(true);
     expect(submitBtn.disabled).toBe(true);
 
     confirmInput.value = "super-secret";
     confirmInput.dispatchEvent(new Event("input"));
 
     expect(error.hidden).toBe(true);
+    expect(confirmInput.classList.contains("mismatch")).toBe(false);
+    expect(submitBtn.disabled).toBe(false);
+  });
+
+  it("keeps the submit button disabled when the passwords match but are shorter than 8 characters", () => {
+    const passwordInput = document.querySelector<HTMLInputElement>('#signup-form input[name="password"]')!;
+    const confirmInput = document.querySelector<HTMLInputElement>('#signup-form input[name="confirm_password"]')!;
+    const error = document.querySelector<HTMLElement>("#signup-confirm-password-error")!;
+    const submitBtn = document.querySelector<HTMLButtonElement>('#signup-form button[type="submit"]')!;
+
+    passwordInput.value = "short";
+    passwordInput.dispatchEvent(new Event("input"));
+    confirmInput.value = "short";
+    confirmInput.dispatchEvent(new Event("input"));
+
+    expect(error.hidden).toBe(true);
+    expect(submitBtn.disabled).toBe(true);
+
+    passwordInput.value = "short123";
+    passwordInput.dispatchEvent(new Event("input"));
+    confirmInput.value = "short123";
+    confirmInput.dispatchEvent(new Event("input"));
+
     expect(submitBtn.disabled).toBe(false);
   });
 });
