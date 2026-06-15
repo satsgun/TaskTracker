@@ -1,4 +1,4 @@
-from datetime import datetime
+from datetime import datetime, timezone
 
 from fastapi import Cookie, Depends, HTTPException, status
 from sqlalchemy.orm import Session
@@ -24,7 +24,7 @@ def get_current_user(
 
     session, user = result
 
-    if datetime.utcnow() - session.last_seen_at >= IDLE_TIMEOUT:
+    if datetime.now(timezone.utc).replace(tzinfo=None) - session.last_seen_at >= IDLE_TIMEOUT:
         crud.delete_session(db, session_id)
         raise not_authenticated
 

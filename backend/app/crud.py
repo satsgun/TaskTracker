@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timezone
 
 from sqlalchemy import select
 from sqlalchemy.orm import Session
@@ -36,7 +36,7 @@ def get_session_with_user(db: Session, session_id: str) -> tuple[AuthSession, Us
 
 
 def touch_session(db: Session, session: AuthSession) -> None:
-    session.last_seen_at = datetime.utcnow()
+    session.last_seen_at = datetime.now(timezone.utc).replace(tzinfo=None)
     db.commit()
 
 

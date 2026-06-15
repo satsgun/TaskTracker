@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 from fastapi.testclient import TestClient
 from sqlalchemy import select
@@ -218,7 +218,7 @@ class TestMe:
         idle_client.post("/auth/login", json={"email": "me-idle@example.com", "password": "super-secret"})
 
         session = db_session.execute(select(AuthSession)).scalars().one()
-        session.last_seen_at = datetime.utcnow() - timedelta(minutes=31)
+        session.last_seen_at = datetime.now(timezone.utc).replace(tzinfo=None) - timedelta(minutes=31)
         db_session.commit()
 
         response = idle_client.get("/auth/me")
