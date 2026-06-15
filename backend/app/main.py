@@ -9,8 +9,8 @@ from sqlalchemy.orm import Session
 
 from app import crud
 from app.auth import get_current_user
-from app.config import COOKIE_SECURE, SESSION_COOKIE_NAME
-from app.database import Base, engine, get_db
+from app.config import COOKIE_SECURE, DEMO_USER_EMAIL, DEMO_USER_PASSWORD, SESSION_COOKIE_NAME
+from app.database import Base, SessionLocal, engine, get_db
 from app.models import User
 from app.schemas import TaskCreate, TaskOut, TaskUpdate, UserCreate, UserLogin, UserOut
 from app.security import hash_password, verify_password
@@ -18,6 +18,24 @@ from app.security import hash_password, verify_password
 logger = logging.getLogger(__name__)
 
 Base.metadata.create_all(bind=engine)
+
+
+def _seed_demo_user(session_factory=SessionLocal) -> None:
+    db = session_factory()
+    try:
+        if crud.get_user_by_email(db, DEMO_USER_EMAIL) is None:
+            crud.create_user(
+                db,
+                first_name="Demo",
+                last_name="User",
+                email=DEMO_USER_EMAIL,
+                hashed_password=hash_password(DEMO_USER_PASSWORD),
+            )
+    finally:
+        db.close()
+
+
+_seed_demo_user()
 
 if COOKIE_SECURE:
     logger.warning(

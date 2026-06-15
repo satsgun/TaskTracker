@@ -228,3 +228,21 @@ installs the backend, and runs it with uvicorn (the backend serves the
 built frontend as described above). CI (`.github/workflows/ci.yml`) runs
 backend and frontend tests, updates coverage badges on `main`, and triggers
 a Render deploy after both test jobs pass.
+
+[![CI](https://github.com/satsgun/TaskTracker/actions/workflows/ci.yml/badge.svg)](https://github.com/satsgun/TaskTracker/actions/workflows/ci.yml)
+![Backend coverage](badges/backend-coverage.svg)
+![Frontend coverage](badges/frontend-coverage.svg)
+
+## Live demo
+
+**▶ Try it: [<https://tasktracker-backend-ubrr.onrender.com>](https://tasktracker-backend-ubrr.onrender.com/)**
+
+> **Note:** hosted on Render's free tier, so the first request may take **~30–60 seconds or more** to wake the service. If you see a blank page or spinner, give it a moment and refresh — it's cold-starting, not broken.
+
+**Demo account** (so you can skip signup):
+
+| Email | Password |
+| --- | --- |
+| `demo@example.com` | `demotest123` |
+
+Or create your own account — note the demo database is for evaluation only and is reset periodically, so don't store anything you want to keep.
