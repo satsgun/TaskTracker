@@ -10,33 +10,34 @@ frontend as static files and exposes a REST API under `/tasks/`.
 ## Architecture
 
 ```
-┌─────────────────────────────────────────────────────────────┐
-│                         Browser                              │
-│                                                                │
-│   index.html ── src/main.ts                                  │
-│                     │  fetch()                               │
+┌───────────────────────────────────────────────────────────────┐
+│                         Browser                               │
+│                                                               │
+│   index.html ── src/main.ts                                   │
+│                     │  fetch()                                │
 │                     ├─ src/render.ts  (DOM rendering)         │
 │                     └─ src/tasks.ts   (filtering, row state)  │
 └──────────────────────────────│────────────────────────────────┘
-                                │ HTTP (JSON)
-                                ▼
-┌─────────────────────────────────────────────────────────────┐
-│                    FastAPI app (backend/app)                 │
-│                                                                │
-│   main.py        routes: /health, /tasks/...                 │
+                               │ HTTP (JSON)
+                               │
+                               ▼
+┌───────────────────────────────────────────────────────────────┐
+│                    FastAPI app (backend/app)                  │
+│                                                               │
+│   main.py        routes: /health, /tasks/...                  │
 │      │                                                        │
-│   schemas.py     request/response validation (Pydantic)      │
+│   schemas.py     request/response validation (Pydantic)       │
 │      │                                                        │
-│   crud.py        business logic (create/list/update/delete)  │
+│   crud.py        business logic (create/list/update/delete)   │
 │      │                                                        │
-│   models.py      SQLAlchemy ORM model (Task)                 │
+│   models.py      SQLAlchemy ORM model (Task)                  │
 │      │                                                        │
-│   database.py    engine / session / Base                     │
+│   database.py    engine / session / Base                      │
 │      ▼                                                        │
 │   SQLite (tasktracker.db)                                     │
-│                                                                │
-│   StaticFiles mount at "/" serves frontend/dist (built UI)   │
-└─────────────────────────────────────────────────────────────┘
+│                                                               │
+│   StaticFiles mount at "/" serves frontend/dist (built UI)    │
+└───────────────────────────────────────────────────────────────┘
 ```
 
 - **Frontend** (`frontend/src`): `main.ts` wires up the DOM (`index.html`) to
